@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyTutor AI – Ms. Aanya</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0F172A; --surface:#111827; --surface2:#1F2937; --border:#374151;
+  --accent:#6366F1; --accent-h:#4F46E5; --accent2:#A5B4FC;
+  --green:#22C55E; --yellow:#FBBF24; --blue:#60A5FA; --red:#EF4444;
+  --text:#E5E7EB; --text-dim:#9CA3AF; --text-muted:#6B7280;
+  --wb-bg:#f8fafc; --wb-line:#e2e8f0;
+  --code-bg:#0B1020; --code-kw:#C084FC; --code-fn:#60A5FA;
+  --code-str:#34D399; --code-num:#FBBF24; --code-cmt:#6B7280;
+  --terminal:#020617;
+}
+body.light-mode {
+  --bg:#FFF7ED; --surface:#FFFFFF; --surface2:#FEF3E2; --border:#F0D9B5;
+  --accent:#7C3AED; --accent-h:#6D28D9; --accent2:#A78BFA;
+  --green:#16A34A; --yellow:#B45309; --blue:#1D4ED8; --red:#DC2626;
+  --text:#1C1917; --text-dim:#57534E; --text-muted:#A8A29E;
+  --wb-bg:#FFFBF5; --wb-line:#F0D9B5;
+  --code-bg:#FDF6EC; --code-kw:#7C3AED; --code-fn:#1D4ED8;
+  --code-str:#15803D; --code-num:#B45309; --code-cmt:#A8A29E;
+  --terminal:#1C1917;
+  --badge-theory-bg:#EDE9FE; --badge-theory-color:#5B21B6;
+  --badge-code-bg:#DCFCE7; --badge-code-color:#15803D;
+  --sidebar-bg:#FFFBF5; --topbar-bg:#FFF7ED;
+}
+/* Dark mode badge vars */
+:root {
+  --badge-theory-bg:#1E293B; --badge-theory-color:#38BDF8;
+  --badge-code-bg:#1E293B;   --badge-code-color:#22C55E;
+  --sidebar-bg:var(--surface); --topbar-bg:var(--surface);
+}
+body.light-mode .comp-output { color: #16A34A; }
+body.light-mode .out-line { color: #16A34A; }
+/* Light mode sidebar gets a warm tint */
+body.light-mode .sidebar { background: var(--sidebar-bg); border-right-color:#F0D9B5; }
+body.light-mode .topbar  { background: var(--topbar-bg);  border-bottom-color:#F0D9B5; }
+body.light-mode .avatar-panel { background: var(--sidebar-bg); border-right-color:#F0D9B5; }
+body.light-mode .avatar-ring { background:#FEF3E2; }
+body.light-mode .tbtn { border-color:#D4B896; color:#57534E; }
+body.light-mode .tbtn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
+body.light-mode .ch-title { color:var(--accent); }
+body.light-mode .ri:hover { background:rgba(124,58,237,.07); }
+body.light-mode .ri.active { background:rgba(124,58,237,.12); border-left-color:var(--accent); }
+body.light-mode .caption-box { background:#FEF3E2; border-color:var(--accent); }
+body.light-mode .quiz-box { background:rgba(255,247,237,.9); }
+body.light-mode .voice-btn { background:#FEF3E2; border-color:#D4B896; }
+body.light-mode .quick-btn { border-color:#D4B896; color:#57534E; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:10px;}
+.logo{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#6366F1,#A5B4FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
+.topbar-center{display:flex;align-items:center;gap:10px;flex:1;justify-content:center;}
+.mic-toggle{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:.7rem;color:var(--text-dim);transition:all .2s;user-select:none;}
+.mic-toggle.active{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,.12);}
+.mic-dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim);transition:all .2s;}
+.mic-toggle.active .mic-dot{background:var(--accent);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes eyeClosing{0%{transform:scaleY(1)}100%{transform:scaleY(0.05)}}
+@keyframes eyeOpening{0%{transform:scaleY(0.05)}100%{transform:scaleY(1)}}
+@keyframes mouthTalk{0%,100%{d:path("M84 124Q100 128 116 124")}25%{d:path("M86 122Q100 133 114 122")}50%{d:path("M85 123Q100 135 115 123")}75%{d:path("M86 122Q100 131 114 122")}}
+.mouth-talking{animation:mouthTalk 0.2s ease-in-out infinite;}
+.mode-indicator{font-size:.7rem;color:var(--text-dim);display:flex;align-items:center;gap:5px;}
+.mode-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 2s infinite;}
+.topbar-btns{display:flex;gap:6px;flex-shrink:0;}
+.tbtn{padding:5px 12px;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);transition:all .2s;font-family:'Nunito',sans-serif;white-space:nowrap;}
+.tbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tbtn:hover:not(.active){border-color:var(--accent);color:var(--text);}
+
+/* PROGRESS */
+.progress-bar{height:3px;background:var(--border);flex-shrink:0;}
+.progress-fill{height:100%;background:var(--accent);transition:width 1s ease;width:3%;}
+
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden;}
+
+/* SYLLABUS */
+.sidebar{width:200px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-hdr{padding:10px 12px 7px;font-size:.6rem;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;border-bottom:1px solid var(--border);}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:5px 0;}
+.ch-title{padding:7px 12px 2px;font-size:.58rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;}
+.ri{display:flex;align-items:center;gap:7px;padding:5px 12px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;}
+.ri:hover{background:rgba(99,102,241,.06);}
+.ri.active{background:rgba(99,102,241,.12);border-left-color:var(--accent);}
+.ri.done{opacity:.7;}
+.ri-dot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1.5px solid var(--text-muted);flex-shrink:0;transition:all .2s;}
+.ri.done .ri-dot{background:var(--green);border-color:var(--green);}
+.ri.active .ri-dot{background:var(--accent);border-color:var(--accent);}
+.ri-label{font-size:.7rem;color:var(--text-dim);line-height:1.2;flex:1;}
+.ri.active .ri-label{color:var(--text);font-weight:700;}
+.ri-badge{font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:8px;}
+.ri-badge.theory{background:var(--badge-theory-bg);color:var(--badge-theory-color);}
+.ri-badge.code{background:var(--badge-code-bg);color:var(--badge-code-color);}
+
+/* AVATAR PANEL */
+.avatar-panel{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 8px;gap:8px;overflow-y:auto;}
+.avatar-ring{width:150px;height:150px;border-radius:50%;background:#1F2937;border:2px solid var(--accent);overflow:hidden;position:relative;flex-shrink:0;}
+.avatar-ring svg{width:100%;height:100%;}
+.speak-dot{position:absolute;bottom:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:9px;opacity:0;transition:opacity .3s;}
+.speak-dot.on{opacity:1;animation:blink 1s infinite;}
+.teacher-name{font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:800;text-align:center;}
+.teacher-name small{display:block;font-size:.63rem;color:var(--accent);font-family:'Nunito',sans-serif;font-weight:600;}
+.caption-box{width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:10px;padding:8px 10px;min-height:90px;max-height:130px;overflow-y:auto;}
+.caption-label{font-size:.58rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.caption-text{font-size:.74rem;color:var(--text-dim);line-height:1.6;}
+.cursor-blink{display:inline-block;width:2px;height:12px;background:var(--accent);margin-left:2px;animation:blink .8s infinite;vertical-align:middle;}
+.voice-section{width:100%;display:flex;flex-direction:column;gap:5px;}
+.voice-label{font-size:.58rem;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+.voice-btn{width:100%;padding:7px;border-radius:9px;border:2px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.voice-btn:hover{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.voice-btn.listening{border-color:var(--accent);background:rgba(99,102,241,.15);animation:pulse-border 1.5s infinite;}
+@keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.3)}50%{box-shadow:0 0 0 6px rgba(99,102,241,0)}}
+.quick-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.quick-btn{padding:4px 6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:.65rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;text-align:center;}
+.quick-btn:hover{border-color:var(--accent);color:var(--accent);}
+.quiz-box{width:100%;background:rgba(17,24,39,.8);border:1px solid var(--border);border-radius:10px;padding:9px;backdrop-filter:blur(8px);}
+.quiz-box h4{font-size:.62rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.quiz-q{font-size:.74rem;line-height:1.5;margin-bottom:6px;color:var(--text);}
+.quiz-opts{display:flex;flex-direction:column;gap:3px;}
+.quiz-opt{padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;text-align:left;}
+.quiz-opt:hover{border-color:var(--accent);color:var(--text);}
+.quiz-opt.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.1);}
+.quiz-opt.wrong{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.1);}
+
+/* CONTENT */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.panel.active{display:flex;}
+
+/* CHAT */
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;}
+.msg{display:flex;gap:9px;margin-bottom:12px;}
+.msg.user{flex-direction:row-reverse;}
+.msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;flex-shrink:0;}
+.msg-av.ai{background:var(--accent);color:#fff;}
+.msg-av.usr{background:var(--surface2);color:var(--text);}
+.msg-bubble{max-width:75%;padding:9px 13px;border-radius:12px;font-size:.83rem;line-height:1.6;}
+.msg.ai .msg-bubble{background:var(--surface2);border:1px solid var(--border);border-top-left-radius:4px;}
+.msg.user .msg-bubble{background:var(--accent);color:#fff;border-top-right-radius:4px;}
+.typing-dots{display:flex;gap:4px;padding:4px 0;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim);animation:bounce .8s infinite;}
+.dot:nth-child(2){animation-delay:.15s;}
+.dot:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,80%,100%{transform:scale(.8)}40%{transform:scale(1.2)}}
+.chat-bar{padding:8px 12px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:7px;}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:7px 11px;font-family:'Nunito',sans-serif;font-size:.82rem;color:var(--text);outline:none;}
+.chat-input:focus{border-color:var(--accent);}
+.send-btn{padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;}
+.send-btn:hover{background:var(--accent-h);}
+
+/* WHITEBOARD */
+.wb-panel{flex:1;overflow-y:auto;padding:20px 24px;background:var(--wb-bg);position:relative;}
+.wb-lines{position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(transparent,transparent 31px,var(--wb-line) 31px,var(--wb-line) 32px);pointer-events:none;}
+.wb-title{font-family:'Baloo 2',cursive;font-size:1.7rem;font-weight:800;color:#4338CA;position:relative;margin-bottom:10px;}
+.wb-content{position:relative;}
+.wb-text{font-family:'Nunito',sans-serif;font-size:.98rem;color:#374151;line-height:2.2;}
+.wb-highlight{background:#FEF3C7;padding:1px 5px;border-radius:4px;font-weight:700;}
+.wb-arrow{display:inline-block;color:var(--accent);font-size:1.1rem;margin:0 4px;}
+.wb-box{display:inline-block;border:2px solid var(--accent);border-radius:5px;padding:1px 8px;background:rgba(99,102,241,.07);font-weight:700;color:var(--accent);}
+.wb-diagram{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+.wb-card{background:rgba(17,24,39,.07);border:1px solid #c7d2fe;border-radius:9px;padding:9px 14px;text-align:center;min-width:90px;}
+.wb-card .icon{font-size:1.4rem;}
+.wb-card .label{font-size:.74rem;font-weight:700;color:#4338CA;margin-top:3px;}
+.wb-card .desc{font-size:.62rem;color:#6b7280;margin-top:1px;}
+.wb-teacher{position:absolute;bottom:12px;right:12px;width:70px;opacity:.25;}
+.wb-teacher svg{width:100%;}
+
+/* CODE EDITOR */
+.code-panel{flex:1;display:flex;flex-direction:column;background:var(--code-bg);}
+.editor-tabs{display:flex;background:#0B1020;border-bottom:1px solid var(--border);padding:0 8px;}
+.editor-tab{padding:7px 14px;font-size:.73rem;font-family:'JetBrains Mono',monospace;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.editor-tab.active{color:var(--text);border-bottom-color:var(--accent);}
+.editor-body{flex:1;display:flex;overflow:hidden;}
+.line-nums{background:#0B1020;padding:13px 9px;color:#4B5563;font-family:'JetBrains Mono',monospace;font-size:.79rem;line-height:1.8;text-align:right;user-select:none;min-width:42px;border-right:1px solid #1E293B;}
+.code-area{flex:1;padding:13px 14px;font-family:'JetBrains Mono',monospace;font-size:.79rem;line-height:1.8;overflow-y:auto;}
+.code-line{white-space:pre;opacity:0;transition:opacity .3s;}
+.code-line.show{opacity:1;}
+.kw{color:var(--code-kw);} .fn{color:var(--code-fn);} .str{color:var(--code-str);}
+.num{color:var(--code-num);} .cmt{color:var(--code-cmt);font-style:italic;}
+.var{color:var(--text-dim);} .op{color:var(--accent2);}
+.output-panel{height:100px;background:var(--terminal);border-top:1px solid var(--border);padding:8px 13px;font-family:'JetBrains Mono',monospace;font-size:.78rem;overflow-y:auto;}
+.output-label{font-size:.6rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.out-line{color:var(--green);white-space:pre;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;max-height:92vh;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;}
+.modal-close{width:26px;height:26px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.modal-body{overflow-y:auto;padding:16px;flex:1;}
+
+/* PRACTICE */
+.pq-grid{display:grid;grid-template-columns:260px 1fr;gap:14px;min-height:500px;}
+.pq-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:560px;}
+.pq-item{padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .2s;}
+.pq-item:hover,.pq-item.sel{border-color:var(--accent);background:rgba(99,102,241,.08);}
+.pq-item.solved{border-color:var(--green);}
+.pq-item-title{font-size:.78rem;font-weight:700;margin-bottom:3px;}
+.pq-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.diff{font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:8px;}
+.diff.easy{background:rgba(34,197,94,.15);color:var(--green);}
+.diff.medium{background:rgba(251,191,36,.15);color:var(--yellow);}
+.diff.hard{background:rgba(239,68,68,.15);color:var(--red);}
+.pq-tag{font-size:.6rem;color:var(--text-muted);background:var(--surface);padding:1px 5px;border-radius:5px;}
+.solved-mark{font-size:.6rem;color:var(--green);font-weight:700;}
+.pq-ws{display:flex;flex-direction:column;gap:10px;}
+.pq-qbox{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.pq-qtitle{font-size:.95rem;font-weight:800;margin-bottom:7px;}
+.pq-qdesc{font-size:.82rem;color:var(--text-dim);line-height:1.7;white-space:pre-wrap;}
+.pq-expected{background:var(--bg);border-radius:7px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--green);margin-top:8px;}
+.hint-btn{font-size:.7rem;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;margin-top:7px;}
+.hint-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+.hint-box{font-size:.77rem;color:var(--yellow);background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:9px;margin-top:5px;display:none;}
+.pq-editor{width:100%;min-height:160px;font-family:'JetBrains Mono',monospace;font-size:.8rem;background:var(--code-bg);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:11px;resize:vertical;outline:none;line-height:1.7;}
+.pq-editor:focus{border-color:var(--accent);}
+.pq-actions{display:flex;gap:7px;align-items:center;}
+.pq-run{padding:6px 16px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.78rem;}
+.pq-run:hover{background:var(--accent-h);}
+.pq-ask{padding:6px 12px;background:var(--surface2);color:var(--text-dim);border:1px solid var(--border);border-radius:7px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.78rem;}
+.pq-ask:hover{border-color:var(--accent);color:var(--accent);}
+.pq-result{font-family:'JetBrains Mono',monospace;font-size:.77rem;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);min-height:44px;white-space:pre-wrap;}
+.pq-result.ok{border-color:var(--green);color:var(--green);}
+.pq-result.err{border-color:var(--red);color:var(--red);}
+.pq-result.info{color:var(--text-dim);}
+
+/* COMPILER */
+.comp-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:520px;}
+.comp-editor-wrap,.comp-out-wrap{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.comp-bar{display:flex;align-items:center;justify-content:space-between;padding:7px 13px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.comp-lang{font-size:.7rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+.comp-run{padding:4px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.73rem;font-family:'Nunito',sans-serif;}
+.comp-run:hover{background:var(--accent-h);}
+.comp-run:disabled{opacity:.5;cursor:not-allowed;}
+.comp-textarea{flex:1;background:var(--code-bg);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;border:none;padding:13px;resize:none;outline:none;line-height:1.7;}
+.comp-stdin-wrap{border-top:1px solid var(--border);flex-shrink:0;}
+.comp-stdin-label{padding:5px 13px;font-size:.65rem;color:var(--text-dim);font-weight:700;text-transform:uppercase;background:var(--surface2);}
+.comp-stdin{width:100%;background:var(--code-bg);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.76rem;border:none;padding:8px 13px;resize:none;outline:none;height:52px;}
+.comp-out-hdr{padding:7px 13px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.68rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.comp-status{font-size:.65rem;padding:2px 7px;border-radius:9px;background:var(--surface);color:var(--text-dim);}
+.comp-status.running{color:var(--yellow);}
+.comp-status.done{color:var(--green);}
+.comp-output{flex:1;background:var(--terminal);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:13px;overflow-y:auto;white-space:pre-wrap;line-height:1.7;}
+.comp-output.error{color:var(--red);}
+.comp-templates{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.comp-tpl{padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:.67rem;cursor:pointer;font-family:'Nunito',sans-serif;}
+.comp-tpl:hover{border-color:var(--accent);color:var(--accent);}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.dash-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px;}
+.dash-card.wide{grid-column:1/-1;}
+.dash-card.half{grid-column:span 2;}
+.dash-card-title{font-size:.67rem;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.dash-stat{font-size:1.9rem;font-weight:900;color:var(--accent);font-family:'Baloo 2',cursive;}
+.dash-stat-sub{font-size:.7rem;color:var(--text-dim);margin-top:1px;}
+.pr-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+.pr-label{font-size:.72rem;color:var(--text);width:140px;flex-shrink:0;}
+.pr-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pr-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .8s;}
+.pr-pct{font-size:.68rem;color:var(--text-dim);width:30px;text-align:right;}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.67rem;font-weight:700;}
+.tag.strong{background:rgba(34,197,94,.15);color:var(--green);}
+.tag.weak{background:rgba(239,68,68,.15);color:var(--red);}
+.tag.neutral{background:var(--surface);color:var(--text-dim);}
+.quiz-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.qt-item{padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--surface);text-align:center;cursor:pointer;transition:all .2s;}
+.qt-item:hover{border-color:var(--accent);}
+.qt-title{font-size:.68rem;font-weight:700;margin-bottom:3px;}
+.qt-score{font-size:1.05rem;font-weight:900;font-family:'Baloo 2',cursive;}
+.qt-score.g{color:var(--green);} .qt-score.y{color:var(--yellow);} .qt-score.r{color:var(--red);}
+.qt-meta{font-size:.6rem;color:var(--text-dim);}
+
+/* MISC */
+.toast{position:fixed;bottom:14px;right:14px;background:var(--surface2);border:1px solid var(--accent);border-radius:9px;padding:7px 13px;font-size:.77rem;z-index:999;animation:fade-in .2s;pointer-events:none;}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">PyTutor AI</div>
+  <div class="topbar-center">
+    <div class="mode-indicator"><div class="mode-dot"></div><span id="modeLabel">Chat Mode</span></div>
+  </div>
+  <div class="topbar-btns">
+    <button class="tbtn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌙 Dark</button>
+    <button class="tbtn active" id="btn-chat"      onclick="setMode('chat',true)">Chat</button>
+    <button class="tbtn"        id="btn-whiteboard" onclick="setMode('whiteboard',true)">Whiteboard</button>
+    <button class="tbtn"        id="btn-code"       onclick="setMode('code',true)">Code</button>
+    <button class="tbtn"        id="btn-practice"   onclick="openPractice()">Practice</button>
+    <button class="tbtn"        id="btn-compiler"   onclick="openCompiler()">Compiler</button>
+    <button class="tbtn"        id="btn-dashboard"  onclick="openDashboard()">Dashboard</button>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="main">
+
+  <!-- SYLLABUS -->
+  <div class="sidebar">
+    <div class="sidebar-hdr">Class Syllabus</div>
+    <div class="sidebar-scroll" id="syllabusEl"></div>
+  </div>
+
+  <!-- AVATAR -->
+  <div class="avatar-panel">
+    <div class="avatar-ring" id="avatarRing">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="sg" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#f5c5a3"/><stop offset="100%" stop-color="#e8a882"/></radialGradient>
+          <radialGradient id="hg" cx="50%" cy="0%"  r="80%"><stop offset="0%" stop-color="#3e2723"/><stop offset="100%" stop-color="#1a0a00"/></radialGradient>
+          <radialGradient id="eg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#312E81"/></radialGradient>
+        </defs>
+        <ellipse cx="100" cy="195" rx="75" ry="50" fill="#6366F1"/>
+        <ellipse cx="100" cy="175" rx="55" ry="35" fill="#818CF8"/>
+        <path d="M78 162L100 178L122 162" fill="none" stroke="white" stroke-width="2" opacity=".5"/>
+        <ellipse cx="100" cy="158" rx="15" ry="12" fill="url(#sg)"/>
+        <ellipse cx="100" cy="105" rx="52" ry="58" fill="url(#sg)"/>
+        <ellipse cx="100" cy="60"  rx="52" ry="42" fill="url(#hg)"/>
+        <ellipse cx="56"  cy="108" rx="12" ry="32" fill="url(#hg)"/>
+        <ellipse cx="144" cy="108" rx="12" ry="32" fill="url(#hg)"/>
+        <path d="M52 72Q100 42 148 72Q140 58 100 52Q60 58 52 72Z" fill="#3d2415"/>
+        <ellipse cx="50"  cy="108" rx="8" ry="10" fill="#e8a882"/>
+        <ellipse cx="150" cy="108" rx="8" ry="10" fill="#e8a882"/>
+        <path d="M72 84Q83 80 92 83" stroke="#3e2723" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M108 83Q117 80 128 84" stroke="#3e2723" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <g class="eye-l" style="transform-origin:82px 96px">
+          <ellipse cx="82" cy="96" rx="12" ry="10" fill="white"/>
+          <ellipse cx="82" cy="97" rx="8"  ry="7"  fill="url(#eg)"/>
+          <ellipse cx="82" cy="97" rx="4.5" ry="4.5" fill="#0F172A"/>
+          <ellipse cx="85" cy="94" rx="2"  ry="2"  fill="white"/>
+        </g>
+        <g class="eye-r" style="transform-origin:118px 96px">
+          <ellipse cx="118" cy="96" rx="12" ry="10" fill="white"/>
+          <ellipse cx="118" cy="97" rx="8"  ry="7"  fill="url(#eg)"/>
+          <ellipse cx="118" cy="97" rx="4.5" ry="4.5" fill="#0F172A"/>
+          <ellipse cx="121" cy="94" rx="2"  ry="2"  fill="white"/>
+        </g>
+        <path d="M100 100Q95 112 100 115Q105 112 100 100" fill="#d4926e" opacity=".5"/>
+        <path d="M84 124Q92 120 100 121Q108 120 116 124Q108 127 100 127Q92 127 84 124Z" fill="#c0705a"/>
+        <path class="mouth" id="avatarMouth" d="M84 124Q100 128 116 124" fill="none" stroke="#7a3825" stroke-width="1.5" stroke-linecap="round" style="transform-origin:100px 124px"/>
+        <rect x="68"  y="88" width="28" height="17" rx="8" fill="none" stroke="#6366F1" stroke-width="1.5" opacity=".5"/>
+        <rect x="104" y="88" width="28" height="17" rx="8" fill="none" stroke="#6366F1" stroke-width="1.5" opacity=".5"/>
+        <line x1="96" y1="97" x2="104" y2="97" stroke="#6366F1" stroke-width="1.5" opacity=".5"/>
+        <circle cx="50"  cy="118" r="4" fill="#FBBF24"/>
+        <circle cx="150" cy="118" r="4" fill="#FBBF24"/>
+      </svg>
+      <div class="speak-dot" id="speakDot">🎤</div>
+    </div>
+    <div class="teacher-name">Ms. Aanya<small>AI Python Teacher</small></div>
+    <div class="caption-box">
+      <div class="caption-label">Live Captions</div>
+      <div class="caption-text" id="captionText">Hi! I am Ms. Aanya.<span class="cursor-blink"></span></div>
+    </div>
+    <div class="voice-section">
+      <div class="voice-label">Ask a Question</div>
+      <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">Microphone — Tap to Speak</button>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="askDoubt('What is Python?')">What is Python?</button>
+        <button class="quick-btn" onclick="askDoubt('Show me an example')">Show example</button>
+        <button class="quick-btn" onclick="askDoubt('Explain again')">Explain again</button>
+        <button class="quick-btn" onclick="askDoubt('Quiz me')">Quiz me</button>
+      </div>
+    </div>
+    <div class="quiz-box" id="quizBox" style="display:none">
+      <h4>Quick Quiz</h4>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-opts" id="quizOpts"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="contentEl">
+    <!-- CHAT -->
+    <div class="panel active" id="chatPanel" style="flex-direction:column;">
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="msg ai">
+          <div class="msg-av ai">Ms</div>
+          <div class="msg-bubble">Namaste! I am <strong>Ms. Aanya</strong>, your Python teacher.<br><br>
+          Python is one of the most beginner-friendly languages in the world. Together we will make it super easy to learn.<br><br>
+          Pick any topic from the <strong>Class Syllabus</strong> on the left, and I will explain it step by step. What is your name?</div>
+        </div>
+      </div>
+      <div class="chat-bar">
+        <input class="chat-input" id="chatInput" placeholder="Type your question here..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="send-btn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+    <!-- WHITEBOARD -->
+    <div class="panel" id="wbPanel">
+      <div class="wb-panel" id="wbContent">
+        <div class="wb-lines"></div>
+        <div class="wb-title" id="wbTitle">Select a topic</div>
+        <div class="wb-content">
+          <div class="wb-text"    id="wbText"></div>
+          <div class="wb-diagram" id="wbDiag"></div>
+        </div>
+        <div class="wb-teacher"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="195" rx="75" ry="50" fill="#6366F1"/>
+          <ellipse cx="100" cy="105" rx="52" ry="58" fill="#f5c5a3"/>
+          <ellipse cx="100" cy="60"  rx="52" ry="42" fill="#1a0a00"/>
+          <ellipse cx="82"  cy="96"  rx="10" ry="9" fill="white"/>
+          <ellipse cx="118" cy="96"  rx="10" ry="9" fill="white"/>
+          <ellipse cx="82"  cy="97"  rx="5"  ry="5" fill="#0F172A"/>
+          <ellipse cx="118" cy="97"  rx="5"  ry="5" fill="#0F172A"/>
+          <path d="M84 124Q100 130 116 124" fill="none" stroke="#c0705a" stroke-width="2.5" stroke-linecap="round"/>
+        </svg></div>
+      </div>
+    </div>
+    <!-- CODE -->
+    <div class="panel" id="codePanel">
+      <div class="editor-tabs">
+        <div class="editor-tab active">lesson.py</div>
+        <div class="editor-tab">output</div>
+      </div>
+      <div class="editor-body">
+        <div class="line-nums" id="lineNums">1</div>
+        <div class="code-area"  id="codeArea"></div>
+      </div>
+      <div class="output-panel">
+        <div class="output-label">Terminal Output</div>
+        <div id="outputLines"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRACTICE MODAL -->
+<div class="overlay" id="practiceOverlay">
+  <div class="modal" style="width:92vw;max-width:980px;">
+    <div class="modal-hdr">
+      <span class="modal-title">Practice Questions</span>
+      <button class="modal-close" onclick="closePractice()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="pq-grid">
+        <div class="pq-list" id="pqList"></div>
+        <div class="pq-ws"   id="pqWS">
+          <div style="color:var(--text-dim);font-size:.88rem;padding:20px;text-align:center;">← Select a question to start</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPILER MODAL -->
+<div class="overlay" id="compilerOverlay">
+  <div class="modal" style="width:92vw;max-width:980px;">
+    <div class="modal-hdr">
+      <span class="modal-title">Online Python Compiler</span>
+      <button class="modal-close" onclick="closeCompiler()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="comp-templates" id="compTpls"></div>
+      <div class="comp-layout">
+        <div class="comp-editor-wrap">
+          <div class="comp-bar">
+            <span class="comp-lang">Python 3.10</span>
+            <button class="comp-run" id="compRunBtn" onclick="runCompiler()">▶ Run</button>
+          </div>
+          <textarea class="comp-textarea" id="compCode" spellcheck="false" placeholder="# Write Python here...&#10;print('Hello, World!')"></textarea>
+          <div class="comp-stdin-wrap">
+            <div class="comp-stdin-label">Stdin (input)</div>
+            <textarea class="comp-stdin" id="compStdin" placeholder="Enter input values here..."></textarea>
+          </div>
+        </div>
+        <div class="comp-out-wrap">
+          <div class="comp-out-hdr">
+            Output
+            <span class="comp-status" id="compStatus">Ready</span>
+          </div>
+          <div class="comp-output" id="compOut">Press ▶ Run to execute your code...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD MODAL -->
+<div class="overlay" id="dashOverlay">
+  <div class="modal" style="width:92vw;max-width:1050px;">
+    <div class="modal-hdr">
+      <span class="modal-title">My Dashboard</span>
+      <button class="modal-close" onclick="closeDashboard()">✕</button>
+    </div>
+    <div class="modal-body" id="dashBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentMode = 'chat';
+let currentTopic = null;
+let studentName = '';
+let isSpeaking = false;
+let isListening = false;
+let alwaysOnMic = false;
+let recognition = null;
+let synth = window.speechSynthesis;
+let typingInterval = null;
+let chatHistory = [];
+let completedTopics = new Set();
+let solvedPractice = new Set();
+let dashData = { quizScores: {}, visits: {} };
+
+// ═══════════════════════════════════════════════════════════
+// EMOJI STRIP
+// ═══════════════════════════════════════════════════════════
+function stripEmoji(t) {
+  return t.split('').filter(c => c.charCodeAt(0) < 0x2600 || c.charCodeAt(0) > 0xFFFD).join('').replace(/  +/g,' ').trim();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════════════
+function speak(raw, cb) {
+  if (!synth) { if(cb) cb(); return; }
+  const text = stripEmoji(raw);
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const voices = synth.getVoices();
+  const fv = voices.find(v =>
+    v.name.includes('Samantha') || v.name.includes('Zira') ||
+    v.name.includes('Google UK English Female') || v.name.includes('Female') ||
+    v.name.includes('Karen') || v.name.includes('Moira')
+  ) || voices.find(v => v.lang.startsWith('en'));
+  if (fv) u.voice = fv;
+  u.rate = 0.92; u.pitch = 1.05; u.volume = 1;
+  u.onstart  = () => {
+    isSpeaking=true;
+    document.getElementById('speakDot').classList.add('on');
+    const mouth = document.getElementById('avatarMouth');
+    if (mouth) mouth.classList.add('mouth-talking');
+  };
+  u.onend    = () => {
+    isSpeaking=false;
+    document.getElementById('speakDot').classList.remove('on');
+    const mouth = document.getElementById('avatarMouth');
+    if (mouth) mouth.classList.remove('mouth-talking');
+    if(cb)cb();
+  };
+  u.onerror  = () => {
+    isSpeaking=false;
+    document.getElementById('speakDot').classList.remove('on');
+    const mouth = document.getElementById('avatarMouth');
+    if (mouth) mouth.classList.remove('mouth-talking');
+    if(cb)cb();
+  };
+  synth.speak(u);
+}
+
+function typeCaption(text) {
+  const el = document.getElementById('captionText');
+  if (typingInterval) clearInterval(typingInterval);
+  const plain = text.replace(/<[^>]*>/g,'');
+  let i = 0; el.textContent = '';
+  typingInterval = setInterval(() => {
+    if (i >= plain.length) { clearInterval(typingInterval); return; }
+    el.textContent = plain.slice(0, ++i);
+  }, 22);
+}
+
+// ═══════════════════════════════════════════════════════════
+// VOICE — TOPIC KEYWORD MAP
+// ═══════════════════════════════════════════════════════════
+const topicKW = {
+  intro:      ['introduction','intro','what is python','about python'],
+  install:    ['install','setup','download python'],
+  helloworld: ['hello world','first program','hello'],
+  comments:   ['comment','comments','hash'],
+  datatypes:  ['data type','datatypes','int float','types of data'],
+  variables:  ['variable','variables','store value'],
+  input:      ['user input','taking input','input function'],
+  operators:  ['operator','operators','arithmetic'],
+  ifelse:     ['if else','if statement','condition','conditional'],
+  loops:      ['loop','loops','for loop','while loop'],
+  break:      ['break','continue','break and continue'],
+  functions:  ['function','functions','def keyword','define'],
+  params:     ['parameter','return','arguments','return value'],
+  scope:      ['scope','local global','variable scope'],
+  lists:      ['list','lists','array'],
+  tuples:     ['tuple','tuples'],
+  dicts:      ['dictionary','dictionaries','dict'],
+  sets:       ['set','sets'],
+  strings:    ['string','strings','string methods'],
+  fileio:     ['file','file handling','read file','write file'],
+  errors:     ['error','exception','try except','error handling'],
+  modules:    ['module','modules','import','imports'],
+};
+
+function voiceToTopic(text) {
+  const l = text.toLowerCase();
+  for (const [id, kws] of Object.entries(topicKW)) {
+    if (kws.some(k => l.includes(k))) return id;
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MIC — ALWAYS ON
+// ═══════════════════════════════════════════════════════════
+function toggleAlwaysOnMic() {
+  alwaysOnMic = !alwaysOnMic;
+  const btn = document.getElementById('micToggle');
+  const lbl = document.getElementById('micLabel');
+  if (alwaysOnMic) {
+    btn.classList.add('active'); lbl.textContent = 'Mic On';
+    startMic(true);
+  } else {
+    btn.classList.remove('active'); lbl.textContent = 'Mic Off';
+    stopMic();
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('themeToggle');
+  btn.textContent = isLight ? '🌞 Light' : '🌙 Dark';
+}
+
+function startMic(continuous) {
+  if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+    showToast('Speech recognition not supported. Please use Chrome.');
+    alwaysOnMic = false; return;
+  }
+  // Destroy any old instance first
+  if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = continuous;
+  recognition.interimResults = true;   // get partial results for responsiveness
+  recognition.lang = 'en-IN';
+
+  recognition.onresult = e => {
+    // Only act on final results
+    const last = e.results[e.results.length - 1];
+    if (!last.isFinal) return;
+    const transcript = last[0].transcript.trim();
+    if (!transcript) return;
+    const tid = voiceToTopic(transcript);
+    if (tid) {
+      showToast('Going to: ' + (topics[tid] ? topics[tid].title : tid));
+      if (!continuous) { isListening = false; updateVoiceBtn(false); }
+      loadTopic(tid);
+    } else {
+      const inp = document.getElementById('chatInput');
+      inp.value = transcript;
+      if (!continuous) { isListening = false; updateVoiceBtn(false); }
+      sendChat();
+    }
+  };
+
+  recognition.onend = () => {
+    if (alwaysOnMic) {
+      // Auto-restart for always-on mode
+      setTimeout(() => {
+        if (alwaysOnMic) startMic(true);
+      }, 300);
+    } else {
+      isListening = false;
+      updateVoiceBtn(false);
+      recognition = null;
+    }
+  };
+
+  recognition.onerror = e => {
+    console.warn('Mic error:', e.error);
+    if (e.error === 'not-allowed') {
+      showToast('Microphone access denied. Please allow mic in browser settings.');
+      alwaysOnMic = false;
+      const btn = document.getElementById('micToggle');
+      if (btn) { btn.classList.remove('active'); }
+      document.getElementById('micLabel').textContent = 'Mic Off';
+      isListening = false; updateVoiceBtn(false);
+      return;
+    }
+    if (e.error === 'no-speech' && !alwaysOnMic) {
+      showToast('No speech detected. Try again.');
+      isListening = false; updateVoiceBtn(false);
+    }
+    // For other errors in always-on mode, just restart
+    if (alwaysOnMic) setTimeout(() => { if (alwaysOnMic) startMic(true); }, 500);
+  };
+
+  try {
+    recognition.start();
+    isListening = true;
+    updateVoiceBtn(true);
+  } catch(ex) {
+    console.warn('Could not start recognition:', ex);
+    isListening = false;
+    updateVoiceBtn(false);
+    recognition = null;
+  }
+}
+
+function stopMic() {
+  alwaysOnMic = false;
+  if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
+  isListening = false;
+  updateVoiceBtn(false);
+}
+
+function toggleVoice() {
+  // Tap-to-speak button
+  if (isListening) {
+    stopMic();
+  } else {
+    // If always-on is active, this button turns it off
+    if (alwaysOnMic) { toggleAlwaysOnMic(); return; }
+    startMic(false);
+  }
+}
+
+function updateVoiceBtn(on) {
+  const b = document.getElementById('voiceBtn');
+  if (!b) return;
+  b.classList.toggle('listening', on);
+  b.textContent = on ? 'Listening... tap to stop' : 'Microphone — Tap to Speak';
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ═══════════════════════════════════════════════════════════
+function setMode(mode, userTriggered, silent) {
+  currentMode = mode;
+  ['chat','whiteboard','code'].forEach(m => {
+    document.getElementById('btn-'+m).classList.toggle('active', m===mode);
+    const p = document.getElementById(m==='chat'?'chatPanel':m==='whiteboard'?'wbPanel':'codePanel');
+    if (p) { p.classList.toggle('active', m===mode); p.style.display = m===mode?'flex':'none'; }
+  });
+  const labels = { chat:'Chat Mode', whiteboard:'Whiteboard Mode', code:'Code Mode' };
+  document.getElementById('modeLabel').textContent = labels[mode] || mode;
+  if (mode==='code' && !silent) renderCurrentCode(false);
+  if (mode==='code' && silent)  renderCurrentCode(true);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SYLLABUS
+// ═══════════════════════════════════════════════════════════
+const syllabus = [
+  { ch:'Chapter 1 — Basics', items:[
+    {id:'intro',     label:'Introduction to Python', type:'theory'},
+    {id:'install',   label:'Setup & Installation',   type:'theory'},
+    {id:'helloworld',label:'Hello World Program',    type:'code'},
+    {id:'comments',  label:'Comments in Python',     type:'theory'},
+  ]},
+  { ch:'Chapter 2 — Data', items:[
+    {id:'datatypes', label:'Data Types',           type:'theory'},
+    {id:'variables', label:'Variables',            type:'code'},
+    {id:'input',     label:'Taking User Input',    type:'code'},
+    {id:'operators', label:'Operators',            type:'theory'},
+  ]},
+  { ch:'Chapter 3 — Control Flow', items:[
+    {id:'ifelse',    label:'If / Else Conditions', type:'theory'},
+    {id:'loops',     label:'For & While Loops',    type:'code'},
+    {id:'break',     label:'Break & Continue',     type:'code'},
+  ]},
+  { ch:'Chapter 4 — Functions', items:[
+    {id:'functions', label:'Defining Functions',   type:'code'},
+    {id:'params',    label:'Parameters & Return',  type:'code'},
+    {id:'scope',     label:'Scope of Variables',   type:'theory'},
+  ]},
+  { ch:'Chapter 5 — Collections', items:[
+    {id:'lists',     label:'Lists',         type:'code'},
+    {id:'tuples',    label:'Tuples',        type:'theory'},
+    {id:'dicts',     label:'Dictionaries',  type:'code'},
+    {id:'sets',      label:'Sets',          type:'theory'},
+  ]},
+  { ch:'Chapter 6 — Advanced', items:[
+    {id:'strings',   label:'String Methods',    type:'code'},
+    {id:'fileio',    label:'File Handling',     type:'code'},
+    {id:'errors',    label:'Error Handling',    type:'theory'},
+    {id:'modules',   label:'Modules & Imports', type:'code'},
+  ]},
+];
+
+function buildSyllabus() {
+  document.getElementById('syllabusEl').innerHTML = syllabus.map(ch =>
+    '<div class="chapter-group">' +
+    '<div class="ch-title">' + ch.ch + '</div>' +
+    ch.items.map(it =>
+      '<div class="ri" id="ri-' + it.id + '" onclick="loadTopic(\'' + it.id + '\')">' +
+      '<div class="ri-dot"></div>' +
+      '<div class="ri-label">' + it.label + '</div>' +
+      '<span class="ri-badge ' + it.type + '">' + (it.type==='code'?'Code':'Theory') + '</span>' +
+      '</div>'
+    ).join('') +
+    '</div>'
+  ).join('');
+}
+
+function markActive(id) {
+  document.querySelectorAll('.ri').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('ri-'+id);
+  if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+function markDone(id) {
+  completedTopics.add(id);
+  const el = document.getElementById('ri-'+id);
+  if (el && !el.classList.contains('active')) el.classList.add('done');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOPIC DATA
+// ═══════════════════════════════════════════════════════════
+const topics = {
+
+  intro:{title:'Introduction to Python',screenType:'theory',
+    explanation:"Let us start with the most important question — what is Python? Python is a programming language. A programming language is a way to give instructions to a computer. Just like we use Hindi or English to talk to each other, we use Python to talk to computers. Python was created by Guido van Rossum in 1991. What makes Python special is that it reads almost like plain English. So even if you have never written code before, Python will feel very natural. Python is used everywhere — Google, Netflix, and Instagram all use Python. You can build websites, create artificial intelligence, analyse data, automate boring tasks, and even make games.",
+    wb:{title:'What is Python?',
+      text:`Python is a <span class="wb-highlight">high-level programming language</span> created by <span class="wb-box">Guido van Rossum</span> in <span class="wb-box">1991</span>.<br><br>
+<span class="wb-arrow">&#8594;</span> Python reads almost like <span class="wb-highlight">plain English</span><br>
+<span class="wb-arrow">&#8594;</span> Used for <span class="wb-highlight">web apps, AI, data science, automation</span><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-highlight">Very beginner-friendly</span> — one of the best first languages`,
+      diagram:[{icon:'🌐',label:'Web Dev',desc:'Django, Flask'},{icon:'🤖',label:'AI & ML',desc:'TensorFlow'},{icon:'📊',label:'Data',desc:'Pandas'},{icon:'🎮',label:'Games',desc:'Pygame'},{icon:'🔧',label:'Automation',desc:'Scripts'}]},
+    code:null,
+    caption:"Python is a beginner-friendly language created in 1991. It reads like English and is used for web, AI, data, and automation.",
+    quiz:{q:'Who created Python?',opts:['Bill Gates','Guido van Rossum','Elon Musk','Linus Torvalds'],ans:1}},
+
+  install:{title:'Setup & Installation',screenType:'theory',
+    explanation:"Before writing any Python code, we need to set it up on the computer. The steps are simple. Go to python.org in your browser and download Python 3. When you run the installer, tick the checkbox that says Add Python to PATH — this is very important. It lets your computer find Python from anywhere. After installing, open a terminal and type python dash dash version. If you see a version number, Python is installed correctly. Also download VS Code — Visual Studio Code — a free code editor by Microsoft that makes writing Python very comfortable with syntax highlighting and autocomplete.",
+    wb:{title:'Setting Up Python',
+      text:`To start coding in Python, you need to install it on your computer.<br><br>
+<span class="wb-arrow">&#8594;</span> Go to <span class="wb-box">python.org</span> and download Python 3<br>
+<span class="wb-arrow">&#8594;</span> Run the installer — check <span class="wb-highlight">Add Python to PATH</span><br>
+<span class="wb-arrow">&#8594;</span> Open a terminal and type <span class="wb-box">python --version</span><br>
+<span class="wb-arrow">&#8594;</span> Install <span class="wb-highlight">VS Code</span> as your code editor`,
+      diagram:[{icon:'🌐',label:'Download',desc:'python.org'},{icon:'💻',label:'Install',desc:'Run .exe'},{icon:'🔍',label:'Verify',desc:'python --version'},{icon:'✅',label:'Ready!',desc:'Start coding'}]},
+    code:null,
+    caption:"Download Python from python.org. Tick Add Python to PATH. Verify with python dash dash version. Install VS Code.",
+    quiz:{q:'Where do you download Python from?',opts:['google.com','python.org','github.com','microsoft.com'],ans:1}},
+
+  helloworld:{title:'Hello World Program',screenType:'code',wb:null,
+    explanation:"Now let us write your very first Python program. Every programmer in history has started with Hello World — it is a tradition. In Python it is just one single line. You write the word print, open a bracket, write your message in quote marks, then close the bracket. Python displays whatever you put inside those quotes. Watch the code appear now — I will explain each line in detail.",
+    codeExplanation:"That is all it takes. One line of code and Python printed your message. This is the beauty and simplicity of Python.",
+    code:{
+      lines:['<span class="cmt"># My very first Python program</span>','','<span class="fn">print</span>(<span class="str">"Hello, World!"</span>)','','<span class="cmt"># Print a few more lines</span>','<span class="fn">print</span>(<span class="str">"I am learning Python!"</span>)','<span class="fn">print</span>(<span class="str">"Python is amazing!"</span>)'],
+      narrations:[
+        'This is a comment. The hash symbol tells Python to ignore this line completely. Comments are notes for us humans — Python skips them when running the code.',
+        '',
+        'This is the print function. It displays output on the screen. Whatever you write inside the brackets and quote marks appears as output. Here it will print Hello World.',
+        '',
+        'Another comment explaining what comes next.',
+        'We call print again with a different message. Each print statement creates one new line of output.',
+        'A third print statement. Notice how simple and readable this is — almost like plain English.'
+      ],
+      output:['Hello, World!','I am learning Python!','Python is amazing!'],
+      outputExplanation:'Three print statements gave us three lines of output. Each one printed exactly the text we put in quotes.'
+    },
+    caption:"print() displays text. Each call makes one new line. This is the most used function in Python.",
+    quiz:{q:'Which function shows output on screen in Python?',opts:['write()','show()','print()','display()'],ans:2}},
+
+  comments:{title:'Comments in Python',screenType:'theory',
+    explanation:"When you write code — especially long programs — it is very important to leave notes explaining what your code does. These notes are called comments. In Python, a comment starts with the hash symbol. Everything written after the hash on that same line is completely ignored by Python when it runs. Python just skips past it. Why use comments? First, to explain what a piece of code does. Second, to leave reminders for yourself. Third, when working with teammates, comments help everyone understand your thinking. Get into the habit of writing comments from the very beginning — it is a mark of a good programmer.",
+    wb:{title:'Comments in Python',
+      text:`A <span class="wb-highlight">comment</span> is a note in your code that Python <span class="wb-highlight">completely ignores</span>.<br><br>
+<span class="wb-arrow">&#8594;</span> Use the <span class="wb-box">#</span> symbol to write a comment<br>
+<span class="wb-arrow">&#8594;</span> Everything after <span class="wb-box">#</span> on that line is ignored<br>
+<span class="wb-arrow">&#8594;</span> Comments help <span class="wb-highlight">explain your code</span> to others<br><br>
+Example: <span class="wb-box"># This calculates the area of a circle</span>`,
+      diagram:[{icon:'📝',label:'Explain code',desc:'For humans'},{icon:'🔇',label:'Ignored',desc:'Python skips it'},{icon:'#',label:'Symbol',desc:'Hash symbol'}]},
+    code:null,
+    caption:"Comments start with hash and are ignored by Python. Use them to explain your code and leave notes for yourself and others.",
+    quiz:{q:'Which symbol is used to write a comment in Python?',opts:['//','/*','#','--'],ans:2}},
+
+  datatypes:{title:'Data Types',screenType:'theory',
+    explanation:"In Python, every piece of data has a type. Think of data types like different kinds of containers. You would not store water in a paper bag. Similarly, Python uses different types to store different kinds of data. There are five main data types. First, string — written as str — this is text, like your name or a sentence, always in quote marks. Second, integer — written as int — a whole number without decimal, like 5 or 42. Third, float — a number with a decimal point, like 3.14. Fourth, boolean — written as bool — this can only be True or False, nothing else. Fifth, list — a collection that holds multiple values. Knowing data types is fundamental because Python behaves differently depending on what type of data you are working with.",
+    wb:{title:'Data Types in Python',
+      text:`Python has different types of data, like different <span class="wb-highlight">containers</span> for different things.<br><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">str</span> — text: <span class="wb-highlight">"Hello"</span><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">int</span> — whole number: <span class="wb-highlight">42</span><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">float</span> — decimal number: <span class="wb-highlight">3.14</span><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">bool</span> — True or False: <span class="wb-highlight">True</span><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">list</span> — collection: <span class="wb-highlight">["a","b","c"]</span>`,
+      diagram:[{icon:'📝',label:'String',desc:'"text"'},{icon:'🔢',label:'Integer',desc:'42'},{icon:'🔸',label:'Float',desc:'3.14'},{icon:'☑️',label:'Boolean',desc:'True'},{icon:'📋',label:'List',desc:'[1,2,3]'}]},
+    code:null,
+    caption:"Five main types: str for text, int for whole numbers, float for decimals, bool for True or False, and list for collections.",
+    quiz:{q:'What data type is the value 3.14?',opts:['int','string','float','bool'],ans:2}},
+
+  variables:{title:'Variables',screenType:'code',wb:null,
+    explanation:"Now let us learn about variables. A variable is like a labeled storage box. You give the box a name, and you put a value inside it. For example, name equals Aryan creates a box called name holding the text Aryan. Later, whenever you write the word name, Python automatically uses the value Aryan. You can change a variable any time. Variables are incredibly useful because they let you store information once and reuse it many times. Watch the code appear — I will explain each line.",
+    codeExplanation:"We created four variables — name, age, score, and is student — each storing a different type of data. Variables are the foundation of every Python program.",
+    code:{
+      lines:['<span class="cmt"># Variables store data in Python</span>','','<span class="var">name</span> <span class="op">=</span> <span class="str">"Aryan"</span>','<span class="var">age</span> <span class="op">=</span> <span class="num">15</span>','<span class="var">score</span> <span class="op">=</span> <span class="num">98.5</span>','<span class="var">is_student</span> <span class="op">=</span> <span class="kw">True</span>','','<span class="fn">print</span>(<span class="str">"Name:"</span>, <span class="var">name</span>)','<span class="fn">print</span>(<span class="str">"Age:"</span>, <span class="var">age</span>)','<span class="fn">print</span>(<span class="str">"Score:"</span>, <span class="var">score</span>)'],
+      narrations:[
+        'This comment tells us we are creating variables.',
+        '',
+        'We create a variable called name and assign it the string Aryan. The equals sign is the assignment operator — it stores the value on the right into the box named on the left.',
+        'We create age and store the integer 15. No quote marks — this is a number, not text.',
+        'We create score with the value 98.5. Since it has a decimal, Python treats this as a float data type.',
+        'We create is underscore student and set it to True. This is a boolean. Capital T in True is required in Python — lowercase would cause an error.',
+        '',
+        'Now we print the variables. When Python sees the word name here, it looks it up and replaces it with Aryan.',
+        'Same for age — Python substitutes the variable with its stored value 15.',
+        'And score — Python replaces it with 98.5 and prints it on screen.'
+      ],
+      output:['Name: Aryan','Age: 15','Score: 98.5'],
+      outputExplanation:'Each print showed the value inside that variable. Name printed Aryan, Age printed 15, and Score printed 98.5.'
+    },
+    caption:"Variables store data using equals. Name on the left, value on the right. Reuse them anywhere in your code.",
+    quiz:{q:'What will print(age) show if age = 15?',opts:['age','15','"15"','Error'],ans:1}},
+
+  input:{title:'Taking User Input',screenType:'code',wb:null,
+    explanation:"So far our programs have used fixed data we wrote ourselves. But real programs must interact with users — asking questions and receiving answers. In Python we do this with the input function. When Python reaches an input call, it stops, shows the user a message, waits for them to type and press Enter, then stores what they typed in a variable. One critical rule — input always returns text, which is a string. If you want to do math with the value, you must convert it using int for whole numbers or float for decimals. Let me show you this now.",
+    codeExplanation:"Input is how your program talks to the user. Always remember to convert to int or float before doing any calculations.",
+    code:{
+      lines:['<span class="cmt"># Taking input from the user</span>','','<span class="var">name</span> <span class="op">=</span> <span class="fn">input</span>(<span class="str">"What is your name? "</span>)','<span class="fn">print</span>(<span class="str">"Hello,"</span>, <span class="var">name</span>)','','<span class="cmt"># Numbers need int() conversion</span>','<span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Your age? "</span>))','<span class="fn">print</span>(<span class="str">"Next year you will be"</span>, <span class="var">age</span> <span class="op">+</span> <span class="num">1</span>)'],
+      narrations:[
+        'This comment introduces taking user input.',
+        '',
+        'This is the input function. The text inside the quotes is shown as a prompt to the user. Whatever they type is stored in the name variable. Since input always returns a string, name will be text.',
+        'We immediately use the name variable to greet the user. Python joins the word Hello with whatever name was entered.',
+        '',
+        'This comment warns us — input gives text, so we need to convert it to a number before doing math.',
+        'We wrap input inside int(). This converts the typed text into an integer number. Without int(), we could not add 1 to it — you cannot do arithmetic on plain text.',
+        'We add 1 to age to get next year\'s age, then print the result. This works only because we converted age to an integer.'
+      ],
+      output:['What is your name? Aryan','Hello, Aryan','Your age? 15','Next year you will be 16'],
+      outputExplanation:'The program asked for name and age, greeted the user, then calculated next year\'s age correctly by adding 1.'
+    },
+    caption:"input() pauses and waits for the user to type. Wrap with int() or float() before doing any math.",
+    quiz:{q:'Which function takes input from the user?',opts:['get()','scan()','input()','read()'],ans:2}},
+
+  operators:{title:'Operators',screenType:'theory',
+    explanation:"Operators are special symbols in Python that perform operations on values. There are three main groups. The first group is arithmetic operators — these do mathematics. Plus adds. Minus subtracts. The star multiplies. Forward slash divides giving a decimal result. Double slash is floor division — it divides and removes the decimal. The percent sign is modulus — it gives the remainder after division. Double star raises to a power. The second group is comparison operators — these compare two values and return True or False. Double equals checks equality. Exclamation equals checks if values are different. Greater than and less than compare sizes. The third group is logical operators — and, or, and not — used to combine multiple conditions together.",
+    wb:{title:'Operators in Python',
+      text:`Operators are <span class="wb-highlight">symbols that perform operations</span> on values.<br><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">Arithmetic</span>: + &nbsp; - &nbsp; * &nbsp; / &nbsp; // &nbsp; % &nbsp; **<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">Comparison</span>: == &nbsp; != &nbsp; &gt; &nbsp; &lt; &nbsp; &gt;= &nbsp; &lt;=<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">Logical</span>: and &nbsp; or &nbsp; not<br><br>
+Example: <span class="wb-highlight">10 + 5 = 15</span>, &nbsp; <span class="wb-highlight">10 % 3 = 1</span>`,
+      diagram:[{icon:'+',label:'Add',desc:'5+3=8'},{icon:'*',label:'Multiply',desc:'5*3=15'},{icon:'%',label:'Modulus',desc:'7%2=1'},{icon:'**',label:'Power',desc:'2**3=8'}]},
+    code:null,
+    caption:"Arithmetic operators do math. Comparison operators return True or False. Logical operators combine conditions using and, or, and not.",
+    quiz:{q:'What is the result of 10 % 3?',opts:['3','1','0','10'],ans:1}},
+
+  ifelse:{title:'If / Else Conditions',screenType:'theory',
+    explanation:"Now we come to one of the most powerful features of programming — making decisions. In real life we do this all the time. If it is raining, take an umbrella. Else wear sunglasses. Python programs can make decisions too using the if statement. You write the keyword if, then a condition, then a colon. On the next line, indented with 4 spaces, you write the code that runs when the condition is True. Then else colon with the code that runs when False. There is also elif — else if — to check multiple conditions. Indentation is critical in Python. Python uses it to know which code belongs inside the if block. Always use 4 spaces or one Tab. Forgetting indentation will cause an error.",
+    wb:{title:'If / Else in Python',
+      text:`An <span class="wb-highlight">if statement</span> runs code only when a condition is <span class="wb-highlight">True</span>.<br><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">if</span> — runs if the condition is True<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">else</span> — runs if the condition is False<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">elif</span> — checks another condition in between<br><br>
+Think of it as: <span class="wb-highlight">If it rains, take an umbrella. Else, wear sunglasses.</span>`,
+      diagram:[{icon:'?',label:'Condition',desc:'True or False'},{icon:'✓',label:'if block',desc:'Runs if True'},{icon:'✕',label:'else block',desc:'Runs if False'},{icon:'→',label:'elif',desc:'Another check'}]},
+    code:null,
+    caption:"if runs when condition is True. else runs when False. elif checks another condition. Indent the body with 4 spaces — this is required.",
+    quiz:{q:'Which block runs when the if condition is False?',opts:['if','elif','else','def'],ans:2}},
+
+  loops:{title:'For & While Loops',screenType:'code',wb:null,
+    explanation:"Loops are one of the most powerful tools in programming. A loop repeats a block of code multiple times without you writing it again and again. Imagine printing numbers 1 to 100. Without a loop — 100 lines. With a loop — just 2 lines. There are two types. The for loop is used when you know exactly how many times to repeat. The while loop keeps running as long as a condition is True. Watch carefully — I will explain each line as it appears.",
+    codeExplanation:"Loops make computers powerful. You can repeat complex operations thousands of times in just a few lines of code.",
+    code:{
+      lines:['<span class="cmt"># For loop — repeats a set number of times</span>','<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):','    <span class="fn">print</span>(<span class="str">"Count:"</span>, <span class="var">i</span>)','','<span class="cmt"># Loop through a list</span>','<span class="var">fruits</span> <span class="op">=</span> [<span class="str">"Apple"</span>, <span class="str">"Mango"</span>, <span class="str">"Banana"</span>]','<span class="kw">for</span> <span class="var">fruit</span> <span class="kw">in</span> <span class="var">fruits</span>:','    <span class="fn">print</span>(<span class="str">"I like"</span>, <span class="var">fruit</span>)'],
+      narrations:[
+        'This comment introduces the for loop.',
+        'This is the for loop. The variable i starts at 0. range(5) means run exactly 5 times, for values 0, 1, 2, 3, and 4. The colon at the end is required.',
+        'This line is inside the loop — notice the 4 spaces of indentation. Each time the loop runs, it prints Count followed by the current value of i. So we see Count 0, Count 1, up to Count 4.',
+        '',
+        'This comment introduces looping through a list.',
+        'We create a list called fruits with three string items inside square brackets.',
+        'This for loop goes through each item in the fruits list one by one. Each iteration, the variable fruit holds the current item.',
+        'This prints a greeting for each fruit. Python automatically handles all three items — Apple, then Mango, then Banana.'
+      ],
+      output:['Count: 0','Count: 1','Count: 2','Count: 3','Count: 4','I like Apple','I like Mango','I like Banana'],
+      outputExplanation:'The first loop printed Count 0 through Count 4, five times total. The second loop went through each fruit and printed it. Two loops, eight lines of output.'
+    },
+    caption:"for loops repeat a fixed number of times. Loop through lists easily. Indent the loop body with 4 spaces.",
+    quiz:{q:'How many times does "for i in range(3)" run?',opts:['2','3','4','1'],ans:1}},
+
+  break:{title:'Break & Continue',screenType:'code',wb:null,
+    explanation:"Sometimes when a loop is running, you want to stop it early or skip a particular step. Python gives you two keywords for this. Break exits the loop immediately, even if more iterations remain. Think of it as pressing a stop button. Continue skips the rest of the current iteration and jumps straight to the next one. Think of it as saying skip this one. These are useful in search scenarios — once you find what you need, break out. Or to skip invalid values, use continue.",
+    codeExplanation:"Break and continue give you precise control over loops. They make code more efficient and easier to understand.",
+    code:{
+      lines:['<span class="cmt"># break — exits the loop early</span>','<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>):','    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">5</span>:','        <span class="kw">break</span>','    <span class="fn">print</span>(<span class="var">i</span>)','','<span class="cmt"># continue — skips current step</span>','<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):','    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">2</span>:','        <span class="kw">continue</span>','    <span class="fn">print</span>(<span class="var">i</span>)'],
+      narrations:[
+        'This comment tells us we are demonstrating break.',
+        'We start a for loop counting from 0 to 9 — ten iterations total.',
+        'Inside the loop we check — if i equals 5, we want to stop.',
+        'Break exits the loop immediately. When i reaches 5, the loop ends. Numbers 5 through 9 will never print.',
+        'This print runs for every i that did not trigger break — so we see 0, 1, 2, 3, 4.',
+        '',
+        'Now we show continue, which behaves differently.',
+        'This loop counts 0 to 4.',
+        'When i equals 2, we trigger continue.',
+        'Continue skips the rest of this iteration — Python jumps to the next cycle. The print below will not run when i is 2.',
+        'This prints i for all values. Since we skipped 2, the output shows 0, 1, then 3, 4.'
+      ],
+      output:['0','1','2','3','4','-- continue --','0','1','3','4'],
+      outputExplanation:'Break stopped the loop at 5 so only 0 to 4 printed. Continue skipped 2 so the second loop shows 0, 1, 3, 4 with 2 missing.'
+    },
+    caption:"break exits the loop immediately. continue skips the current step and moves to the next iteration.",
+    quiz:{q:'What does break do inside a loop?',opts:['Skips current step','Exits the loop','Restarts the loop','Pauses the loop'],ans:1}},
+
+  functions:{title:'Defining Functions',screenType:'code',wb:null,
+    explanation:"Functions are one of the most important concepts in all of programming. A function is a block of code you write once and reuse as many times as you want. Think of it like a recipe. You write it once, then follow it whenever needed without rewriting it. In Python, you define a function using the keyword def, which stands for define. You give it a name, then list any inputs it needs in brackets — these are called parameters. The code inside is indented. When you need the function, you call it by name. Let me walk through this step by step.",
+    codeExplanation:"Functions make code cleaner, shorter, and reusable. The same logic written once can be called anywhere in your program.",
+    code:{
+      lines:['<span class="cmt"># Define a function using def</span>','<span class="kw">def</span> <span class="fn">greet</span>(<span class="var">name</span>):','    <span class="fn">print</span>(<span class="str">"Hello,"</span>, <span class="var">name</span>)','','<span class="cmt"># Function with a return value</span>','<span class="kw">def</span> <span class="fn">add</span>(<span class="var">a</span>, <span class="var">b</span>):','    <span class="kw">return</span> <span class="var">a</span> <span class="op">+</span> <span class="var">b</span>','','<span class="fn">greet</span>(<span class="str">"Priya"</span>)','<span class="fn">print</span>(<span class="fn">add</span>(<span class="num">10</span>, <span class="num">5</span>))'],
+      narrations:[
+        'This comment tells us we are defining a function.',
+        'def is the keyword to start a function definition. greet is the name we chose. name in brackets is a parameter — a placeholder for the value passed in when called. The colon at the end is required.',
+        'This is the function body — indented 4 spaces. When greet is called, this runs. It prints Hello followed by whatever was passed as name.',
+        '',
+        'Now we define a second function that performs a calculation.',
+        'This function is called add and takes two parameters, a and b. These are the two numbers we will add.',
+        'The return keyword sends the result back to whoever called this function. add(10, 5) will compute 15 and return it.',
+        '',
+        'Here we call greet and pass Priya as the name argument. Python runs the function body with name set to Priya, printing Hello, Priya.',
+        'We call add with 10 and 5. The function returns 15. We pass that directly to print which displays it.'
+      ],
+      output:['Hello, Priya','15'],
+      outputExplanation:'Calling greet with Priya printed Hello Priya. Calling add with 10 and 5 computed and returned 15.'
+    },
+    caption:"def creates a reusable function. Parameters receive values. return sends a result back to the caller.",
+    quiz:{q:'Which keyword defines a function in Python?',opts:['function','def','define','func'],ans:1}},
+
+  params:{title:'Parameters & Return',screenType:'code',wb:null,
+    explanation:"Let us go deeper into parameters and return values. Parameters can have default values — if the caller does not provide one, the default is used automatically. This makes functions flexible. A function can also return multiple values at once by separating them with commas in the return statement. Python packages them together and the caller can unpack them into separate variables. Let me show you both features now.",
+    codeExplanation:"Default parameters and multiple return values make Python functions extremely flexible and powerful.",
+    code:{
+      lines:['<span class="cmt"># Default parameter value</span>','<span class="kw">def</span> <span class="fn">greet</span>(<span class="var">name</span><span class="op">=</span><span class="str">"student"</span>):','    <span class="fn">print</span>(<span class="str">"Hello,"</span>, <span class="var">name</span>)','','<span class="cmt"># Multiple return values</span>','<span class="kw">def</span> <span class="fn">calculate</span>(<span class="var">a</span>, <span class="var">b</span>):','    <span class="kw">return</span> <span class="var">a</span> <span class="op">+</span> <span class="var">b</span>, <span class="var">a</span> <span class="op">-</span> <span class="var">b</span>','','<span class="var">s</span>, <span class="var">d</span> <span class="op">=</span> <span class="fn">calculate</span>(<span class="num">10</span>, <span class="num">4</span>)','<span class="fn">print</span>(<span class="str">"Sum:"</span>, <span class="var">s</span>, <span class="str">"Diff:"</span>, <span class="var">d</span>)'],
+      narrations:[
+        'This comment introduces default parameters.',
+        'The parameter name has a default value of student, set using equals inside the brackets. If greet is called with no argument, name automatically becomes student.',
+        'The function body just prints Hello followed by name — same as before.',
+        '',
+        'Now we define a function that returns two values at once.',
+        'This function is called calculate and takes two parameters a and b.',
+        'The return statement separates two values with a comma — the sum first, then the difference. Python automatically handles returning multiple values this way.',
+        '',
+        'We call calculate with 10 and 4. The two returned values are unpacked into s and d. s gets the sum 14, d gets the difference 6.',
+        'We print both results with labels to confirm.'
+      ],
+      output:['Hello, student','Sum: 14 Diff: 6'],
+      outputExplanation:'Calling greet with no argument used the default student. Calculate returned both 14 and 6 at once, which were unpacked into separate variables.'
+    },
+    caption:"Default parameters work if nothing is passed. Separate multiple return values with commas.",
+    quiz:{q:'What keyword sends a value back from a function?',opts:['send','output','return','give'],ans:2}},
+
+  scope:{title:'Scope of Variables',screenType:'theory',
+    explanation:"Scope tells you where in your code a variable can be accessed. There are two types. Global scope — a variable created outside all functions is global. It can be used from anywhere in the program. Local scope — a variable created inside a function is local. It only exists while that function runs. Once the function finishes, the local variable disappears completely. You cannot access it from outside. Think of it like a house. Things in the living room are available to everyone. Things inside your private bedroom are only available in your room. Understanding scope prevents a very common error — name not defined — which usually means you tried to use a local variable outside the function where it exists.",
+    wb:{title:'Variable Scope',
+      text:`<span class="wb-highlight">Scope</span> means where a variable can be accessed in your code.<br><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">Local</span> — created inside a function, only usable there<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">Global</span> — created outside all functions, usable everywhere<br><br>
+Think of it like a room: a variable inside a room exists only in that room. A variable in the hallway is available to everyone in the house.`,
+      diagram:[{icon:'🏠',label:'Global',desc:'Available everywhere'},{icon:'🚪',label:'Local',desc:'Inside function only'}]},
+    code:null,
+    caption:"Global variables are accessible everywhere. Local variables only exist inside the function they were created in.",
+    quiz:{q:'A variable created inside a function is called?',opts:['Global','Local','Public','Private'],ans:1}},
+
+  lists:{title:'Lists',screenType:'code',wb:null,
+    explanation:"A list is one of the most used data structures in Python. It stores multiple values in a single variable. Instead of ten separate variables for ten fruits, you create one list. Lists are written with square brackets, items separated by commas. Each item has an index starting from zero. The first item is at index 0, the second at index 1, and so on. Negative indices let you count from the end — minus 1 is always the last item. Lists are flexible — add, remove, and loop through them easily. Let me walk through a live example.",
+    codeExplanation:"Lists are used in almost every Python program. Master them and you can solve a huge variety of real problems.",
+    code:{
+      lines:['<span class="cmt"># Lists store multiple values</span>','<span class="var">fruits</span> <span class="op">=</span> [<span class="str">"Apple"</span>, <span class="str">"Mango"</span>, <span class="str">"Banana"</span>]','','<span class="fn">print</span>(<span class="var">fruits</span>[<span class="num">0</span>])   <span class="cmt"># first item</span>','<span class="fn">print</span>(<span class="var">fruits</span>[<span class="op">-</span><span class="num">1</span>])  <span class="cmt"># last item</span>','','<span class="var">fruits</span>.<span class="fn">append</span>(<span class="str">"Grapes"</span>)','<span class="fn">print</span>(<span class="fn">len</span>(<span class="var">fruits</span>))','','<span class="kw">for</span> <span class="var">f</span> <span class="kw">in</span> <span class="var">fruits</span>:','    <span class="fn">print</span>(<span class="var">f</span>)'],
+      narrations:[
+        'This comment tells us we are creating a list.',
+        'We create a list called fruits. Square brackets define a list. Three string items inside, each separated by commas — Apple, Mango, and Banana.',
+        '',
+        'We access the first item using index 0. Python indexing always starts at zero. fruits at index 0 gives us Apple.',
+        'We use index minus 1 to get the last item. Minus 1 always refers to the last element regardless of list length. Here it gives us Banana.',
+        '',
+        'The append method adds a new item to the end of the list. Now fruits has four items — Apple, Mango, Banana, and Grapes.',
+        'The len function returns the total number of items. Since we added Grapes, it now returns 4.',
+        '',
+        'A for loop is perfect for visiting every item in a list. Each iteration, f holds the current item.',
+        'We print each item. The loop handles all four fruits automatically.'
+      ],
+      output:['Apple','Banana','4','Apple','Mango','Banana','Grapes'],
+      outputExplanation:'Index 0 gave Apple. Index minus 1 gave Banana. After appending Grapes, len returned 4. The loop then printed all four fruits.'
+    },
+    caption:"Lists use []. Index starts at 0. -1 is the last item. append() adds. len() counts. Loop with for.",
+    quiz:{q:'What is the index of the first item in a list?',opts:['1','0','-1','None'],ans:1}},
+
+  tuples:{title:'Tuples',screenType:'theory',
+    explanation:"A tuple is similar to a list — it stores multiple values in one variable. But there is one key difference. A tuple is immutable — once created, you cannot change it. You cannot add, remove, or modify any item. Tuples are written with round brackets instead of square brackets. Why use a tuple if it is less flexible? Because immutability is exactly what you want for fixed data. GPS coordinates should never accidentally change. Days of the week are always the same seven. Using a tuple for such data protects it from accidental modification. Tuples are also slightly faster than lists, which matters in large programs.",
+    wb:{title:'Tuples in Python',
+      text:`A <span class="wb-highlight">tuple</span> is like a list, but it <span class="wb-highlight">cannot be changed</span> after creation.<br><br>
+<span class="wb-arrow">&#8594;</span> Written with <span class="wb-box">()</span> round brackets<br>
+<span class="wb-arrow">&#8594;</span> Items are <span class="wb-highlight">fixed</span> — you cannot add or remove them<br>
+<span class="wb-arrow">&#8594;</span> Useful for data that should <span class="wb-highlight">never change</span><br><br>
+Example: <span class="wb-box">coordinates = (28.6, 77.2)</span>`,
+      diagram:[{icon:'🔒',label:'Immutable',desc:'Cannot change'},{icon:'()',label:'Syntax',desc:'Round brackets'},{icon:'📌',label:'Fixed data',desc:'Coords, dates'}]},
+    code:null,
+    caption:"Tuples use () and are immutable. Values cannot be changed after creation. Best for fixed data that should never be modified.",
+    quiz:{q:'Which brackets are used for tuples?',opts:['[]','{}','()','<>'],ans:2}},
+
+  dicts:{title:'Dictionaries',screenType:'code',wb:null,
+    explanation:"A dictionary is one of the most powerful data structures in Python. It stores data as key and value pairs. Think of a real dictionary — you look up a word which is the key, and find its meaning which is the value. In Python it works the same way. Dictionaries use curly brackets. Each pair is written as key colon value, pairs separated by commas. Keys must be unique. Values can be anything. Dictionaries are perfect for storing structured information — like all details about one student. Let me walk through an example now.",
+    codeExplanation:"Dictionaries are used everywhere in professional Python — storing settings, user data, API responses, and much more.",
+    code:{
+      lines:['<span class="cmt"># Dictionary — key: value pairs</span>','<span class="var">student</span> <span class="op">=</span> {','    <span class="str">"name"</span>: <span class="str">"Aryan"</span>,','    <span class="str">"age"</span>: <span class="num">15</span>,','    <span class="str">"grade"</span>: <span class="str">"10th"</span>','}','','<span class="fn">print</span>(<span class="var">student</span>[<span class="str">"name"</span>])','<span class="var">student</span>[<span class="str">"city"</span>] <span class="op">=</span> <span class="str">"Delhi"</span>','<span class="fn">print</span>(<span class="var">student</span>)'],
+      narrations:[
+        'This comment introduces dictionaries.',
+        'We open the curly bracket to start building a dictionary called student.',
+        'The key name in quotes, then a colon, then the value Aryan. This is one key-value pair. The comma separates it from the next.',
+        'The key age with value 15. The key is a string in quotes, the value is an integer without quotes.',
+        'The key grade with value 10th as a string.',
+        'We close the curly bracket to finish the dictionary.',
+        '',
+        'To access a value, use square brackets with the key in quotes. student at key name returns Aryan.',
+        'To add a new key-value pair, just assign it. City did not exist before — Python creates it. If it did exist, this would update the value.',
+        'We print the entire dictionary. Python shows all key-value pairs together.'
+      ],
+      output:['Aryan',"{'name': 'Aryan', 'age': 15, 'grade': '10th', 'city': 'Delhi'}"],
+      outputExplanation:'Accessing the name key returned Aryan. After adding city, printing the whole dictionary shows all four pairs.'
+    },
+    caption:"Dictionaries store key:value pairs in {}. Access with dict[key]. Add new pairs by assigning to a new key.",
+    quiz:{q:'How do you access a value in a dictionary?',opts:['dict.value','dict(key)','dict[key]','dict->key'],ans:2}},
+
+  sets:{title:'Sets',screenType:'theory',
+    explanation:"A set is a collection type with two special properties. First, a set stores only unique values — duplicates are silently removed. Second, a set is unordered — there is no first or last item, and you cannot access items by index. Sets are written with curly brackets without colon pairs. The most useful feature is removing duplicates. If you have a list with repeated values and want only unique ones, convert it to a set. Sets also support mathematical operations like union for combining, intersection for common items, and difference for items in one set but not the other.",
+    wb:{title:'Sets in Python',
+      text:`A <span class="wb-highlight">set</span> stores only <span class="wb-highlight">unique values</span> — no duplicates allowed.<br><br>
+<span class="wb-arrow">&#8594;</span> Written with <span class="wb-box">{}</span> curly brackets<br>
+<span class="wb-arrow">&#8594;</span> Repeated values are <span class="wb-highlight">automatically removed</span><br>
+<span class="wb-arrow">&#8594;</span> No fixed order — unordered collection<br><br>
+Example: <span class="wb-box">colors = {"red","blue","red"}</span><br>
+Result: only <span class="wb-highlight">{"red","blue"}</span> — duplicate removed`,
+      diagram:[{icon:'{}',label:'Syntax',desc:'Curly brackets'},{icon:'1x',label:'Unique only',desc:'No duplicates'},{icon:'?',label:'Unordered',desc:'No index'}]},
+    code:null,
+    caption:"Sets store only unique values using {}. Duplicates are removed automatically. No indexing since sets are unordered.",
+    quiz:{q:'What does a set do with duplicate values?',opts:['Keeps all','Removes duplicates','Raises an error','Sorts them'],ans:1}},
+
+  strings:{title:'String Methods',screenType:'code',wb:null,
+    explanation:"Strings are one of the most used data types in Python. Python provides many powerful built-in methods to work with strings. A method is like a function that belongs to an object — call it with a dot after the variable name. Let me show you the most useful string methods and also f-strings, which is a modern clean way to build strings with variables inside them.",
+    codeExplanation:"These string methods will appear in virtually every Python program you write. Practice them until they feel natural.",
+    code:{
+      lines:['<span class="var">msg</span> <span class="op">=</span> <span class="str">"Hello, Python!"</span>','','<span class="fn">print</span>(<span class="var">msg</span>.<span class="fn">upper</span>())','<span class="fn">print</span>(<span class="var">msg</span>.<span class="fn">lower</span>())','<span class="fn">print</span>(<span class="var">msg</span>.<span class="fn">replace</span>(<span class="str">"Hello"</span>, <span class="str">"Hi"</span>))','<span class="fn">print</span>(<span class="fn">len</span>(<span class="var">msg</span>))','','<span class="cmt"># f-string formatting</span>','<span class="var">name</span> <span class="op">=</span> <span class="str">"Aryan"</span>','<span class="fn">print</span>(<span class="str">f"My name is {name}"</span>)'],
+      narrations:[
+        'We create a string variable msg with the text Hello, Python!',
+        '',
+        'The upper method converts every character to uppercase. Hello becomes HELLO and Python becomes PYTHON.',
+        'The lower method converts everything to lowercase. All capital letters become small.',
+        'The replace method takes two arguments — what to find and what to replace it with. Here Hello is swapped for Hi.',
+        'The len function counts all characters in the string including comma, space, and exclamation mark. Hello, Python! has exactly 15 characters.',
+        '',
+        'F-strings are the modern way to insert variables into strings.',
+        'We create a variable called name.',
+        'An f-string starts with the letter f before the opening quote. Variable names in curly braces are replaced with their actual values automatically when printing.'
+      ],
+      output:['HELLO, PYTHON!','hello, python!','Hi, Python!','15','My name is Aryan'],
+      outputExplanation:'upper gave all capitals. lower gave all lowercase. replace swapped Hello for Hi. len counted 15 characters. The f-string inserted the name variable cleanly.'
+    },
+    caption:"upper(), lower(), replace(), len() are key string methods. F-strings use f with curly braces to insert variables.",
+    quiz:{q:'Which method converts a string to uppercase?',opts:['upper()','toUpper()','capitalize()','big()'],ans:0}},
+
+  fileio:{title:'File Handling',screenType:'code',wb:null,
+    explanation:"File handling means reading from and writing to files on your computer using Python. This is essential when you need data to persist — because when a program stops, all variables are lost. Files survive on disk. Python makes this very clean using the with statement. It opens the file, gives you a variable to work with, and automatically closes the file when done — even if an error occurs. The open function takes the filename and a mode. Mode w writes and creates or overwrites the file. Mode r reads. Mode a appends without deleting existing content. Let me show writing and reading now.",
+    codeExplanation:"File handling is essential in real applications — any time you want data to survive after your program closes.",
+    code:{
+      lines:['<span class="cmt"># Writing to a file</span>','<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"notes.txt"</span>, <span class="str">"w"</span>) <span class="kw">as</span> <span class="var">f</span>:','    <span class="var">f</span>.<span class="fn">write</span>(<span class="str">"Hello from Python!"</span>)','','<span class="cmt"># Reading from a file</span>','<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"notes.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span> <span class="var">f</span>:','    <span class="var">content</span> <span class="op">=</span> <span class="var">f</span>.<span class="fn">read</span>()','    <span class="fn">print</span>(<span class="var">content</span>)'],
+      narrations:[
+        'This comment tells us we are writing to a file.',
+        'We use with open to open a file called notes.txt in write mode — the w in quotes. The as f part gives us the variable f to interact with the file. The with block automatically closes the file when finished.',
+        'The write method writes our text into the file on disk. After this line, notes.txt exists on the computer with Hello from Python inside.',
+        '',
+        'Now we read back what we just wrote.',
+        'We open the same file in read mode — the letter r in quotes. Same with open pattern.',
+        'The read method reads the entire file contents and stores it as a string in the variable content.',
+        'We print content to confirm what was saved.'
+      ],
+      output:['Hello from Python!'],
+      outputExplanation:'We wrote text to a file then read it back. The output confirms the content was saved to disk and retrieved correctly.'
+    },
+    caption:"open() with w writes, r reads. Use with statement to auto-close. Files persist after the program ends.",
+    quiz:{q:'Which mode opens a file for writing?',opts:['"r"','"w"','"x"','"a"'],ans:1}},
+
+  errors:{title:'Error Handling',screenType:'theory',
+    explanation:"When you write programs, things can go wrong. A user types letters when your code expects a number. A file you want to open does not exist. You accidentally divide by zero. Without error handling, any of these crashes your program immediately with a scary error message. We want programs to be robust — handling problems gracefully. Python gives us try and except for this. Code inside the try block is attempted. If an error occurs, Python does not crash — it jumps to the except block and runs that instead. There is also a finally block — code here always runs regardless, error or not. This is useful for cleanup tasks like closing connections. A program that handles errors gracefully looks professional and gives users friendly messages instead of crashes.",
+    wb:{title:'Handling Errors in Python',
+      text:`When code goes wrong, Python throws an <span class="wb-highlight">error</span>. You catch it using <span class="wb-box">try / except</span>.<br><br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">try</span> — code that might cause an error goes here<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">except</span> — runs if an error happens, prevents crash<br>
+<span class="wb-arrow">&#8594;</span> <span class="wb-box">finally</span> — always runs, error or not<br><br>
+This keeps your program from <span class="wb-highlight">crashing</span> on unexpected inputs.`,
+      diagram:[{icon:'?',label:'try',desc:'Attempt code'},{icon:'!',label:'except',desc:'Handle error'},{icon:'✓',label:'finally',desc:'Always runs'}]},
+    code:null,
+    caption:"try holds risky code. except catches errors and prevents crashes. finally always runs at the end no matter what.",
+    quiz:{q:'Which block runs when an error occurs?',opts:['try','except','finally','catch'],ans:1}},
+
+  modules:{title:'Modules & Imports',screenType:'code',wb:null,
+    explanation:"Python comes with a huge library of ready-made tools called modules. A module is a file of Python functions someone else has already written and tested. Instead of writing complex math yourself, import the math module. Instead of coding random number generation, import random. You use the import keyword followed by the module name. After importing, access its tools with module dot function name. Python has hundreds of built-in modules. There are also thousands of third-party modules you can install — like pandas for data analysis and requests for web browsing. Modules are what make Python so powerful in practice.",
+    codeExplanation:"Modules let you accomplish complex tasks in just a few lines. Never reinvent the wheel — import what you need.",
+    code:{
+      lines:['<span class="cmt"># Importing built-in modules</span>','<span class="kw">import</span> <span class="var">math</span>','<span class="kw">import</span> <span class="var">random</span>','','<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">sqrt</span>(<span class="num">25</span>))','<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">pi</span>)','','<span class="var">num</span> <span class="op">=</span> <span class="var">random</span>.<span class="fn">randint</span>(<span class="num">1</span>, <span class="num">10</span>)','<span class="fn">print</span>(<span class="str">"Random number:"</span>, <span class="var">num</span>)'],
+      narrations:[
+        'This comment tells us we are importing modules.',
+        'The import keyword brings the entire math module into our program. After this one line, we have access to dozens of mathematical functions.',
+        'We also import random, which provides tools for generating random numbers and making random choices.',
+        '',
+        'We call math.sqrt to calculate the square root of 25. The dot separates the module name from the function name. Square root of 25 is 5.',
+        'math.pi is a constant stored in the module — not a function. It gives us pi accurate to many decimal places.',
+        '',
+        'We use random.randint with two arguments — the lowest and highest possible values. It returns a random integer anywhere in that range.',
+        'We print the random number with a label. Every time you run this program, you may get a different number — that is the nature of random.'
+      ],
+      output:['5.0','3.141592653589793','Random number: 7'],
+      outputExplanation:'sqrt(25) returned 5.0. math.pi gave pi to many decimal places. randint returned a random number between 1 and 10.'
+    },
+    caption:"import brings in a module's tools. Use module.function() to call them. Hundreds of built-in modules available.",
+    quiz:{q:'Which keyword is used to include a module?',opts:['include','using','import','require'],ans:2}},
+
+};
+
+
+// ═══════════════════════════════════════════════════════════
+// TOPIC RENDERING
+// ═══════════════════════════════════════════════════════════
+function autoSwitchScreen(screenType) {
+  const target = screenType === 'code' ? 'code' : 'whiteboard';
+  if (currentMode !== target) setMode(target, false, true);
+  else if (target === 'code') renderCurrentCode(true);
+}
+
+function renderCurrentCode(silent) {
+  if (!currentTopic || !topics[currentTopic] || !topics[currentTopic].code) return;
+  const t = topics[currentTopic].code;
+  const lines = t.lines || [];
+  const narrations = t.narrations || [];
+  const codeArea = document.getElementById('codeArea');
+  const lineNums  = document.getElementById('lineNums');
+  const outLines  = document.getElementById('outputLines');
+  if (!codeArea) return;
+
+  codeArea.innerHTML = '';
+  lineNums.innerHTML = '';
+  outLines.innerHTML = '';
+
+  lines.forEach((line, i) => {
+    const el = document.createElement('div');
+    el.className = 'code-line' + (silent ? ' show' : '');
+    el.innerHTML = line || '&nbsp;';
+    codeArea.appendChild(el);
+    const ln = document.createElement('div');
+    ln.textContent = i + 1;
+    lineNums.appendChild(ln);
+  });
+
+  if (silent) return;
+
+  let idx = 0;
+  function typeNextLine() {
+    if (idx >= lines.length) {
+      // Show output
+      setTimeout(() => {
+        if (t.output) {
+          t.output.forEach(ol => {
+            const el = document.createElement('div');
+            el.className = 'out-line';
+            el.textContent = ol;
+            outLines.appendChild(el);
+          });
+        }
+        const outExp = t.outputExplanation || '';
+        if (outExp) { typeCaption(outExp); speak(outExp); }
+      }, 400);
+      return;
+    }
+    const lineEl = codeArea.children[idx];
+    if (lineEl) { lineEl.innerHTML = lines[idx] || '&nbsp;'; lineEl.classList.add('show'); }
+    const narr = narrations[idx] || '';
+    idx++;
+    if (narr) {
+      typeCaption(narr);
+      speak(narr, () => setTimeout(typeNextLine, 200));
+    } else {
+      setTimeout(typeNextLine, 300);
+    }
+  }
+  typeNextLine();
+}
+
+function loadTopic(id) {
+  if (!topics[id]) {
+    addAIBubble('This topic is coming soon. Try another from the syllabus!');
+    return;
+  }
+  const t = topics[id];
+  currentTopic = id;
+  dashData.visits[id] = (dashData.visits[id] || 0) + 1;
+
+  markActive(id);
+  document.getElementById('quizBox').style.display = 'none';
+
+  // Progress bar
+  const allIds = [].concat(...syllabus.map(ch => ch.items.map(i => i.id)));
+  const pct = Math.round(100 * (completedTopics.size + 1) / allIds.length);
+  document.getElementById('progressFill').style.width = Math.min(pct,100) + '%';
+
+  // Switch screen silently first
+  autoSwitchScreen(t.screenType);
+
+  // Whiteboard content
+  if (t.wb) {
+    document.getElementById('wbTitle').textContent = t.wb.title;
+    document.getElementById('wbText').innerHTML    = t.wb.text || '';
+    const diagEl = document.getElementById('wbDiag');
+    if (t.wb.diagram && t.wb.diagram.length) {
+      diagEl.innerHTML = t.wb.diagram.map(d =>
+        '<div class="wb-card"><div class="icon">' + d.icon + '</div>' +
+        '<div class="label">' + d.label + '</div>' +
+        '<div class="desc">'  + d.desc  + '</div></div>'
+      ).join('');
+    } else { diagEl.innerHTML = ''; }
+  }
+
+  // Build explanation message
+  const who = studentName ? studentName + ', let us now study ' : 'Let us now study ';
+  const fullExplanation = t.explanation || t.caption || '';
+  const suffix = t.screenType === 'code'
+    ? '<br><br>Watch the code appear line by line on the right.'
+    : '<br><br>Check the whiteboard on the right.';
+
+  // Add message to chat (without switching to chat panel)
+  addAIMessageSilent(who + 'let us now study <strong>' + t.title + '</strong>.<br><br>' + fullExplanation + suffix);
+
+  // Speak explanation, then switch to correct panel and narrate
+  typeCaption(fullExplanation);
+  if (t.screenType === 'code') {
+    speak(fullExplanation, () => {
+      setMode('code', false, false);
+      setTimeout(() => renderCurrentCode(false), 300);
+    });
+    // Show code panel immediately (silently)
+    setMode('code', false, true);
+  } else {
+    speak(fullExplanation);
+    setMode('whiteboard', false, true);
+  }
+
+  markDone(id);
+  if (!completedTopics.has(id)) completedTopics.add(id);
+}
+
+function addAIMessageSilent(html) {
+  const msgs = document.getElementById('chatMsgs');
+  const el = document.createElement('div');
+  el.className = 'msg ai';
+  el.innerHTML = '<div class="msg-av ai">Ms</div><div class="msg-bubble">' + html + '</div>';
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHAT — GEMINI/GROQ VIA FLASK
+// ═══════════════════════════════════════════════════════════
+async function askAI(userText) {
+  chatHistory.push({role:'user', content:userText});
+  if (chatHistory.length > 12) chatHistory = chatHistory.slice(-12);
+  const topicTitle = (currentTopic && topics[currentTopic]) ? topics[currentTopic].title : '';
+  const bubble = createLoadingBubble();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message:userText, topic:topicTitle, history:chatHistory.slice(0,-1)})
+    });
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const reply = (data.reply||'').trim() || "Hmm, I did not get a reply. Try again!";
+    chatHistory.push({role:'assistant',content:reply});
+    if (chatHistory.length>12) chatHistory=chatHistory.slice(-12);
+    showBubble(bubble, reply);
+  } catch(e) {
+    showBubble(bubble, "I could not connect to the server. Make sure Flask (app.py) is running!");
+  }
+}
+
+async function askExplain(style) {
+  const topicTitle = (currentTopic && topics[currentTopic]) ? topics[currentTopic].title : 'Python';
+  addUserMessage('Explain again');
+  const bubble = createLoadingBubble();
+  try {
+    const res = await fetch('/api/explain', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({topic:topicTitle, style:style||'simple'})
+    });
+    const data = await res.json();
+    const reply = data.explanation || ('Let me try again! Think of ' + topicTitle + ' like a recipe — you write the steps once and follow them whenever you need.');
+    showBubble(bubble, reply);
+  } catch {
+    showBubble(bubble, "Could not connect. Check Flask is running.");
+  }
+}
+
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addUserMessage(text);
+
+  if (text.toLowerCase().includes('quiz')) {
+    setTimeout(showQuiz, 800);
+    addAIBubble("Quiz time! Let me test your knowledge.");
+    return;
+  }
+  if (!studentName) {
+    const m = text.match(/(?:my name is |i am |i'm |call me )(\\w+)/i);
+    if (m) {
+      studentName = m[1];
+      addAIBubble('Nice to meet you, ' + studentName + '! Pick any topic from the syllabus on the left to begin!');
+      return;
+    }
+  }
+  askAI(text);
+}
+
+function askDoubt(q) {
+  setMode('chat', false, true);
+  if (q === 'Explain again' && currentTopic) { askExplain('simple'); return; }
+  document.getElementById('chatInput').value = q;
+  sendChat();
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chatMsgs');
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = '<div class="msg-av usr">You</div><div class="msg-bubble">' + escH(text) + '</div>';
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addAIBubble(text) {
+  const b = createLoadingBubble();
+  setTimeout(() => showBubble(b, text), 600);
+}
+
+function createLoadingBubble() {
+  const msgs = document.getElementById('chatMsgs');
+  const el = document.createElement('div');
+  el.className = 'msg ai';
+  el.innerHTML = '<div class="msg-av ai">Ms</div><div class="msg-bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+function showBubble(el, text) {
+  el.querySelector('.msg-bubble').textContent = text;
+  document.getElementById('chatMsgs').scrollTop = 99999;
+  typeCaption(text);
+  speak(text);
+}
+
+function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══════════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════════
+function showQuiz() {
+  if (!currentTopic || !topics[currentTopic]) return;
+  const t = topics[currentTopic];
+  const box = document.getElementById('quizBox');
+  box.style.display = 'block';
+  document.getElementById('quizQ').textContent = t.quiz.q;
+  document.getElementById('quizOpts').innerHTML = t.quiz.opts.map((opt,i) =>
+    '<button class="quiz-opt" onclick="answerQuiz(' + i + ',' + t.quiz.ans + ')">' + opt + '</button>'
+  ).join('');
+  speak(t.quiz.q); typeCaption(t.quiz.q);
+}
+
+function answerQuiz(chosen, correct) {
+  document.querySelectorAll('.quiz-opt').forEach((b,i) => {
+    if (i === correct) b.classList.add('correct');
+    else if (i === chosen && chosen !== correct) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  if (!dashData.quizScores[currentTopic]) dashData.quizScores[currentTopic] = {c:0,t:0};
+  dashData.quizScores[currentTopic].t++;
+  const cText = topics[currentTopic].quiz.opts[correct];
+  if (chosen === correct) {
+    dashData.quizScores[currentTopic].c++;
+    const msg = ['Excellent! Correct!','Amazing, you got it!','Perfect answer!'][Math.floor(Math.random()*3)];
+    speak(msg); typeCaption(msg);
+    showToast('Correct! ' + (studentName ? 'Well done, ' + studentName + '!' : 'Well done!'));
+    addAIBubble((studentName ? studentName + ', that is' : 'That is') + ' correct! Excellent work. Ready for the next topic?');
+  } else {
+    const msg = 'Not quite. The correct answer is ' + cText + '. Keep trying!';
+    speak(msg); typeCaption(msg);
+    showToast('The answer was: ' + cText);
+    addAIBubble('That is okay! The correct answer is ' + cText + '. Every mistake is a learning step!');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRACTICE
+// ═══════════════════════════════════════════════════════════
+const practiceQs = [
+  {id:'p1', title:'Right Triangle Star Pattern', topic:'Loops', diff:'easy', tag:'pattern',
+   desc:'Print a right-angled triangle of stars with n rows.\nFor n = 5:\n*\n**\n***\n****\n*****',
+   expected:'*\n**\n***\n****\n*****',
+   hint:'Use a loop from 1 to n. Print "*" multiplied by the current number.',
+   starter:'n = 5\nfor i in range(1, n+1):\n    print("*" * i)'},
+
+  {id:'p2', title:'Inverted Triangle Pattern', topic:'Loops', diff:'easy', tag:'pattern',
+   desc:'Print an inverted triangle for n = 5:\n*****\n****\n***\n**\n*',
+   expected:'*****\n****\n***\n**\n*',
+   hint:'Loop from n down to 1 using range(n, 0, -1).',
+   starter:'n = 5\nfor i in range(n, 0, -1):\n    # your code here\n    pass'},
+
+  {id:'p3', title:'Pyramid Star Pattern', topic:'Loops', diff:'medium', tag:'pattern',
+   desc:'Print a centered pyramid for n = 5:\n    *\n   ***\n  *****\n *******\n*********',
+   expected:'Centered pyramid',
+   hint:'For row i, print (n-i) spaces then (2*i-1) stars.',
+   starter:'n = 5\nfor i in range(1, n+1):\n    print(" " * (n-i) + "*" * (2*i-1))'},
+
+  {id:'p4', title:'Number Triangle', topic:'Loops', diff:'easy', tag:'pattern',
+   desc:'Print a number triangle for n = 5:\n1\n1 2\n1 2 3\n1 2 3 4\n1 2 3 4 5',
+   expected:'Number triangle',
+   hint:'Inner loop prints numbers 1 through the current row number.',
+   starter:'n = 5\nfor i in range(1, n+1):\n    print(" ".join(str(j) for j in range(1, i+1)))'},
+
+  {id:'p5', title:'Diamond Pattern', topic:'Loops', diff:'hard', tag:'pattern',
+   desc:'Print a diamond for n = 5:\n  *\n ***\n*****\n ***\n  *',
+   expected:'Diamond of stars',
+   hint:'Upper half goes from 1 to n, lower half from n-1 to 1.',
+   starter:'n = 5\nfor i in range(1, n+1):\n    print(" "*(n-i) + "*"*(2*i-1))\nfor i in range(n-1, 0, -1):\n    print(" "*(n-i) + "*"*(2*i-1))'},
+
+  {id:'p6', title:'FizzBuzz', topic:'Conditions', diff:'easy', tag:'logic',
+   desc:'Print 1 to 20. Multiples of 3: "Fizz". Multiples of 5: "Buzz". Both: "FizzBuzz".',
+   expected:'1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz...',
+   hint:'Check divisible by 15 first, then 3, then 5.',
+   starter:'for i in range(1, 21):\n    if i % 15 == 0:\n        print("FizzBuzz")\n    # add elif conditions here'},
+
+  {id:'p7', title:'Fibonacci Series', topic:'Loops', diff:'medium', tag:'logic',
+   desc:'Print the first 10 Fibonacci numbers:\n0 1 1 2 3 5 8 13 21 34',
+   expected:'0 1 1 2 3 5 8 13 21 34',
+   hint:'Start with a=0, b=1. In each step: print a, then a,b = b,a+b',
+   starter:'a, b = 0, 1\nfor i in range(10):\n    print(a, end=" ")\n    # update a and b here'},
+
+  {id:'p8', title:'Factorial', topic:'Functions', diff:'easy', tag:'logic',
+   desc:'Write factorial(n) that returns n!\nfactorial(5) -> 120\nfactorial(0) -> 1',
+   expected:'120',
+   hint:'Loop from 1 to n, multiplying result each time.',
+   starter:'def factorial(n):\n    result = 1\n    # your loop here\n    return result\n\nprint(factorial(5))'},
+
+  {id:'p9', title:'Check Prime Number', topic:'Functions', diff:'medium', tag:'logic',
+   desc:'Write is_prime(n) that returns True if prime.\nis_prime(7) -> True\nis_prime(10) -> False',
+   expected:'True\nFalse\nTrue',
+   hint:'Check divisibility from 2 up to sqrt(n).',
+   starter:'def is_prime(n):\n    if n < 2: return False\n    for i in range(2, int(n**0.5)+1):\n        # check here\n        pass\n    return True\n\nprint(is_prime(7))\nprint(is_prime(10))\nprint(is_prime(2))'},
+
+  {id:'p10', title:'Reverse a String', topic:'Strings', diff:'easy', tag:'strings',
+   desc:'Reverse a string without [::-1].\nreverse("hello") -> "olleh"',
+   expected:'olleh\nnohtyP',
+   hint:'Build a new string by adding characters from end to start.',
+   starter:'def reverse(s):\n    result = ""\n    for ch in s:\n        result = ch + result\n    return result\n\nprint(reverse("hello"))\nprint(reverse("Python"))'},
+
+  {id:'p11', title:'Count Vowels', topic:'Strings', diff:'easy', tag:'strings',
+   desc:'Count vowels in a string.\ncount_vowels("hello") -> 2\ncount_vowels("Python") -> 1',
+   expected:'2\n1',
+   hint:'Check if each character is in "aeiouAEIOU".',
+   starter:'def count_vowels(s):\n    count = 0\n    for ch in s:\n        if ch in "aeiouAEIOU":\n            count += 1\n    return count\n\nprint(count_vowels("hello"))\nprint(count_vowels("Python"))'},
+
+  {id:'p12', title:'Find Maximum in List', topic:'Lists', diff:'easy', tag:'lists',
+   desc:'Find the largest number without using max().\nfind_max([3,7,2,9,5]) -> 9',
+   expected:'9',
+   hint:'Start with first element as max, compare rest.',
+   starter:'def find_max(lst):\n    max_val = lst[0]\n    for num in lst[1:]:\n        # compare and update\n        pass\n    return max_val\n\nprint(find_max([3, 7, 2, 9, 5]))'},
+
+  {id:'p13', title:'Palindrome Check', topic:'Strings', diff:'medium', tag:'strings',
+   desc:'Check if string is palindrome.\nis_palindrome("racecar") -> True\nis_palindrome("hello") -> False',
+   expected:'True\nFalse',
+   hint:'Compare string with its reverse.',
+   starter:'def is_palindrome(s):\n    # your code\n    pass\n\nprint(is_palindrome("racecar"))\nprint(is_palindrome("hello"))'},
+
+  {id:'p14', title:'Two Sum', topic:'Lists', diff:'medium', tag:'algorithms',
+   desc:'Find two numbers that add to target, return their indices.\ntwo_sum([2,7,11,15], 9) -> [0,1]',
+   expected:'[0, 1]\n[1, 2]',
+   hint:'Use two nested loops to check all pairs.',
+   starter:'def two_sum(nums, target):\n    for i in range(len(nums)):\n        for j in range(i+1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return [i, j]\n\nprint(two_sum([2,7,11,15], 9))\nprint(two_sum([3,2,4], 6))'},
+
+  {id:'p15', title:'Word Frequency', topic:'Dictionaries', diff:'medium', tag:'dicts',
+   desc:'Count how many times each word appears.\nword_freq("the cat sat on the mat") -> {"the":2,"cat":1,...}',
+   expected:'Dictionary with word counts',
+   hint:'Split text into words, use dict to count each.',
+   starter:'def word_freq(text):\n    words = text.split()\n    freq = {}\n    for word in words:\n        freq[word] = freq.get(word, 0) + 1\n    return freq\n\nprint(word_freq("the cat sat on the mat"))'},
+];
+
+let activePQId = null;
+
+function openPractice() {
+  document.getElementById('practiceOverlay').classList.add('open');
+  renderPQList();
+}
+function closePractice() { document.getElementById('practiceOverlay').classList.remove('open'); }
+
+function renderPQList() {
+  document.getElementById('pqList').innerHTML = practiceQs.map(q =>
+    '<div class="pq-item' + (q.id===activePQId?' sel':'') + (solvedPractice.has(q.id)?' solved':'') + '" onclick="loadPQ(\'' + q.id + '\')">' +
+    '<div class="pq-item-title">' + q.title + (solvedPractice.has(q.id)?' <span class="solved-mark">✓ Solved</span>':'') + '</div>' +
+    '<div class="pq-meta"><span class="diff ' + q.diff + '">' + q.diff.toUpperCase() + '</span>' +
+    '<span class="pq-tag">' + q.topic + '</span><span class="pq-tag">#' + q.tag + '</span></div>' +
+    '</div>'
+  ).join('');
+}
+
+function loadPQ(id) {
+  activePQId = id;
+  const q = practiceQs.find(x => x.id === id);
+  if (!q) return;
+  renderPQList();
+  document.getElementById('pqWS').innerHTML =
+    '<div class="pq-qbox">' +
+    '<div class="pq-qtitle">' + q.title + '</div>' +
+    '<div class="pq-qdesc">' + escH(q.desc) + '</div>' +
+    '<div class="pq-expected">Expected: ' + escH(q.expected) + '</div>' +
+    '<button class="hint-btn" onclick="toggleHint(\'hint_' + id + '\')">Show Hint</button>' +
+    '<div class="hint-box" id="hint_' + id + '">' + escH(q.hint) + '</div>' +
+    '</div>' +
+    '<textarea class="pq-editor" id="pqed_' + id + '" spellcheck="false">' + escH(q.starter) + '</textarea>' +
+    '<div class="pq-actions">' +
+    '<button class="pq-run" onclick="runPQ(\'' + id + '\')">▶ Run Code</button>' +
+    '<button class="pq-ask" onclick="askPQ(\'' + id + '\')">Ask Ms. Aanya</button>' +
+    '</div>' +
+    '<div class="pq-result info" id="pqres_' + id + '">Run your code to see output...</div>';
+}
+
+function toggleHint(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+async function runPQ(id) {
+  const code = document.getElementById('pqed_' + id) ? document.getElementById('pqed_' + id).value : '';
+  const res  = document.getElementById('pqres_' + id);
+  if (!res) return;
+  res.textContent = 'Running...'; res.className = 'pq-result info';
+  const result = await execPython(code, '');
+  if (result.error) {
+    res.textContent = result.error; res.className = 'pq-result err';
+  } else {
+    res.textContent = result.output || '(no output)'; res.className = 'pq-result ok';
+    solvedPractice.add(id); renderPQList();
+  }
+}
+
+async function askPQ(id) {
+  const q = practiceQs.find(x => x.id === id);
+  const code = document.getElementById('pqed_' + id) ? document.getElementById('pqed_' + id).value : '';
+  const res  = document.getElementById('pqres_' + id);
+  if (!res) return;
+  res.textContent = 'Ms. Aanya is thinking...'; res.className = 'pq-result info';
+  try {
+    const r = await fetch('/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: 'Help me with this problem: ' + q.title + '. My code: ' + code + '. Give a hint without the full answer.',
+        topic: q.topic, history: []
+      })
+    });
+    const data = await r.json();
+    res.textContent = 'Ms. Aanya: ' + (data.reply || 'Try looking at the hint!');
+    res.className = 'pq-result info';
+  } catch { res.textContent = 'Could not reach Ms. Aanya. Check Flask is running.'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ONLINE COMPILER
+// ═══════════════════════════════════════════════════════════
+const compTpls = [
+  {n:'Hello World', c:'print("Hello, World!")'},
+  {n:'Star Pattern', c:'n = 5\nfor i in range(1, n+1):\n    print("*" * i)'},
+  {n:'Fibonacci',   c:'a, b = 0, 1\nfor _ in range(10):\n    print(a, end=" ")\n    a, b = b, a+b'},
+  {n:'List Demo',   c:'fruits = ["apple","banana","mango"]\nfor f in fruits:\n    print(f.upper())'},
+  {n:'Function',    c:'def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Aryan"))\nprint(greet("Priya"))'},
+  {n:'Dictionary',  c:'scores = {"Aryan":95,"Priya":88,"Rahul":72}\nfor name,score in scores.items():\n    print(f"{name}: {score}")'},
+];
+
+function openCompiler() {
+  document.getElementById('compilerOverlay').classList.add('open');
+  const tplEl = document.getElementById('compTpls');
+  if (!tplEl.innerHTML) {
+    tplEl.innerHTML = compTpls.map((t,i) =>
+      '<button class="comp-tpl" onclick="loadTpl(' + i + ')">' + t.n + '</button>'
+    ).join('');
+  }
+}
+function closeCompiler() { document.getElementById('compilerOverlay').classList.remove('open'); }
+
+function loadTpl(i) {
+  document.getElementById('compCode').value = compTpls[i].c;
+  document.getElementById('compOut').textContent = 'Press ▶ Run to execute...';
+  document.getElementById('compOut').className = 'comp-output';
+  document.getElementById('compStatus').textContent = 'Ready';
+  document.getElementById('compStatus').className = 'comp-status';
+}
+
+async function runCompiler() {
+  const code  = document.getElementById('compCode').value.trim();
+  const stdin = document.getElementById('compStdin').value;
+  if (!code) { showToast('Write some code first!'); return; }
+  const btn    = document.getElementById('compRunBtn');
+  const out    = document.getElementById('compOut');
+  const status = document.getElementById('compStatus');
+  btn.disabled = true; btn.textContent = 'Running...';
+  out.textContent = ''; out.className = 'comp-output';
+  status.textContent = 'Running'; status.className = 'comp-status running';
+  const result = await execPython(code, stdin);
+  btn.disabled = false; btn.textContent = '▶ Run';
+  if (result.error) {
+    out.textContent = result.error; out.className = 'comp-output error';
+    status.textContent = 'Error'; status.className = 'comp-status';
+  } else {
+    out.textContent = result.output || '(no output)';
+    out.className = 'comp-output';
+    status.textContent = 'Done'; status.className = 'comp-status done';
+  }
+}
+
+async function execPython(code, stdin) {
+  // Try Piston API with several known working version strings
+  const versions = ['3.10.0', '3.9.4', '3.8.1', '*'];
+  for (const ver of versions) {
+    try {
+      const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          language: 'python', version: ver,
+          files: [{name:'main.py', content:code}],
+          stdin: stdin || '', run_timeout: 5000,
+          compile_timeout: 10000
+        })
+      });
+      if (res.status === 400 || res.status === 422) {
+        // Wrong version, try next
+        continue;
+      }
+      if (!res.ok) {
+        // Try next version
+        continue;
+      }
+      const data = await res.json();
+      if (data.message && data.message.includes('version')) continue; // bad version
+      const run = data.run || {};
+      if (run.stderr && run.stderr.trim() && !run.stdout) return {error: run.stderr};
+      return {output: run.stdout || '', error: run.stderr || ''};
+    } catch(e) {
+      // Network error - no point trying other versions
+      return {error: 'No internet connection. Cannot run code.\n' + e.message};
+    }
+  }
+  // All versions failed - use Flask backend as fallback
+  try {
+    const res = await fetch('/api/run', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({code, stdin: stdin||''})
+    });
+    if (!res.ok) throw new Error('server error');
+    const data = await res.json();
+    return {output: data.output||'', error: data.error||''};
+  } catch(e2) {
+    return {error: 'Compiler unavailable. Try: python app.py is running and has internet.'};
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function openDashboard() {
+  document.getElementById('dashOverlay').classList.add('open');
+  renderDashboard();
+}
+function closeDashboard() { document.getElementById('dashOverlay').classList.remove('open'); }
+
+function renderDashboard() {
+  const allItems = syllabus.flatMap(ch => ch.items);
+  const visited  = allItems.filter(it => dashData.visits[it.id]);
+  const quizDone = allItems.filter(it => dashData.quizScores[it.id]);
+  const strong = [], weak = [], neutral = [];
+  allItems.forEach(it => {
+    const sc = dashData.quizScores[it.id];
+    if (!sc) return;
+    const pct = sc.c / sc.t;
+    if (pct >= 0.75) strong.push(it);
+    else if (pct < 0.5) weak.push(it);
+    else neutral.push(it);
+  });
+  const chProg = syllabus.map(ch => {
+    const done = ch.items.filter(it => completedTopics.has(it.id)).length;
+    return {name: ch.ch.replace('Chapter ','Ch.'), pct: Math.round(100*done/ch.items.length), done, total: ch.items.length};
+  });
+
+  document.getElementById('dashBody').innerHTML =
+    '<div class="dash-grid">' +
+    '<div class="dash-card"><div class="dash-card-title">Topics Explored</div>' +
+    '<div class="dash-stat">' + visited.length + '/' + allItems.length + '</div>' +
+    '<div class="dash-stat-sub">topics visited</div></div>' +
+    '<div class="dash-card"><div class="dash-card-title">Practice Solved</div>' +
+    '<div class="dash-stat">' + solvedPractice.size + '/' + practiceQs.length + '</div>' +
+    '<div class="dash-stat-sub">coding questions</div></div>' +
+    '<div class="dash-card"><div class="dash-card-title">Quizzes Taken</div>' +
+    '<div class="dash-stat">' + quizDone.length + '</div>' +
+    '<div class="dash-stat-sub">topics tested</div></div>' +
+    '<div class="dash-card wide"><div class="dash-card-title">Progress by Chapter</div>' +
+    chProg.map(ch =>
+      '<div class="pr-row"><div class="pr-label">' + ch.name + ' (' + ch.done + '/' + ch.total + ')</div>' +
+      '<div class="pr-bar"><div class="pr-fill" style="width:' + ch.pct + '%"></div></div>' +
+      '<div class="pr-pct">' + ch.pct + '%</div></div>'
+    ).join('') + '</div>' +
+    '<div class="dash-card half"><div class="dash-card-title">Strengths (quiz &ge;75%)</div><div class="tag-list">' +
+    (strong.length ? strong.map(it => '<span class="tag strong">' + it.label + '</span>').join('') :
+     '<span style="font-size:.8rem;color:var(--text-dim)">Take some quizzes to see your strengths!</span>') +
+    '</div></div>' +
+    '<div class="dash-card"><div class="dash-card-title">Needs Work (&lt;50%)</div><div class="tag-list">' +
+    (weak.length ? weak.map(it => '<span class="tag weak">' + it.label + '</span>').join('') :
+     '<span style="font-size:.8rem;color:var(--text-dim)">No weak areas yet!</span>') +
+    '</div></div>' +
+    '<div class="dash-card wide"><div class="dash-card-title">Quiz Results</div>' +
+    (quizDone.length === 0
+      ? '<div style="font-size:.85rem;color:var(--text-dim)">No quizzes yet. Click "Quiz me" on any topic!</div>'
+      : '<div class="quiz-grid">' + quizDone.map(it => {
+          const sc = dashData.quizScores[it.id];
+          const pct = Math.round(100*sc.c/sc.t);
+          const cls = pct>=75?'g':pct>=50?'y':'r';
+          return '<div class="qt-item" onclick="loadTopic(\'' + it.id + '\');closeDashboard()">' +
+            '<div class="qt-title">' + it.label + '</div>' +
+            '<div class="qt-score ' + cls + '">' + pct + '%</div>' +
+            '<div class="qt-meta">' + sc.c + '/' + sc.t + ' correct</div></div>';
+        }).join('') + '</div>') + '</div>' +
+    '<div class="dash-card wide"><div class="dash-card-title">Practice Progress</div><div class="tag-list">' +
+    practiceQs.map(q =>
+      '<span class="tag ' + (solvedPractice.has(q.id) ? 'strong' : 'neutral') + '">' + q.title + '</span>'
+    ).join('') + '</div></div>' +
+    '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST & UTILS
+// ═══════════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  buildSyllabus();
+  // Ensure panels start correctly
+  ['chatPanel','wbPanel','codePanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = id === 'chatPanel' ? 'flex' : 'none'; }
+  });
+  if (synth) { synth.getVoices(); synth.onvoiceschanged = () => {}; }
+
+  // Natural eye blinking
+  function doEyeBlink() {
+    const eyeL = document.querySelector('.eye-l');
+    const eyeR = document.querySelector('.eye-r');
+    if (!eyeL || !eyeR) return;
+    const blink = (el) => {
+      el.style.transition = 'transform 0.06s ease-in';
+      el.style.transform = 'scaleY(0.05)';
+      setTimeout(() => {
+        el.style.transition = 'transform 0.08s ease-out';
+        el.style.transform = 'scaleY(1)';
+      }, 80);
+    };
+    blink(eyeL);
+    setTimeout(() => blink(eyeR), 40);
+    // Schedule next blink: random between 2s and 5s
+    setTimeout(doEyeBlink, 2000 + Math.random() * 3000);
+  }
+  setTimeout(doEyeBlink, 1500 + Math.random() * 1000);
+
+  setTimeout(() => {
+    const g = "Hi there! I am Ms. Aanya, your Python teacher. Pick any topic from the Class Syllabus on the left to get started. What is your name?";
+    typeCaption(g); speak(g);
+  }, 800);
+});
+</script>
+</body>
+</html>
