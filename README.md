@@ -162,5 +162,3 @@ Powered by **Groq** running **LLaMA 3.3 70B** (`llama-3.3-70b-versatile`).
 - **Change avatar appearance** — edit the inline SVG inside `.avatar-ring` in `tutor.html`
 
 ---
-
-*Built with ❤️ for students learning Python*
